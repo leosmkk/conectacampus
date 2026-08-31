@@ -1,0 +1,46 @@
+[
+  {
+    "order": 1,
+    "title": "Semana de Tecnologia 2026",
+    "org": "Centro Acadêmico de Computação",
+    "dateLabel": "12 de setembro",
+    "time": "19:00",
+    "place": "Auditório Central",
+    "status": "inscrito",
+    "seatsUsed": 148,
+    "seatsTotal": 240
+  },
+  {
+    "order": 2,
+    "title": "Palestra: Ética em Inteligência Artificial",
+    "org": "Centro Acadêmico de Filosofia",
+    "dateLabel": "18 de setembro",
+    "time": "14:30",
+    "place": "Sala B-204",
+    "status": "vagas",
+    "seatsUsed": 34,
+    "seatsTotal": 60
+  },
+  {
+    "order": 3,
+    "title": "Workshop de Robótica Educacional",
+    "org": "Centro Acadêmico de Engenharia",
+    "dateLabel": "24 de setembro",
+    "time": "09:00",
+    "place": "Lab de Automação",
+    "status": "lotado",
+    "seatsUsed": 40,
+    "seatsTotal": 40
+  },
+  {
+    "order": 4,
+    "title": "Feira de Iniciação Científica",
+    "org": "Pró-reitoria de Pesquisa",
+    "dateLabel": "2 de outubro",
+    "time": "10:00",
+    "place": "Pavilhão Norte",
+    "status": "vagas",
+    "seatsUsed": 210,
+    "seatsTotal": 500
+  }
+]
