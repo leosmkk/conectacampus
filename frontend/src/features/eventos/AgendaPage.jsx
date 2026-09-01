@@ -1,6 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
-import { buscarEventos } from '../../services/api.js';
-import { Loading, ErrorMessage } from '../../components/Feedback.jsx';
+import {
+  buscarEventos,
+  inserirEvento,
+  alterarEvento,
+  excluirEvento
+} from '../../services/api.js';
+import { Loading, ErrorMessage, SuccessMessage } from '../../components/Feedback.jsx';
+import EventoForm from './EventoForm.jsx';
 
 export default function AgendaPage() {
   const [eventos, setEventos] = useState([]);
@@ -8,24 +14,90 @@ export default function AgendaPage() {
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [aviso, setAviso] = useState('');
+
+  const [formAberto, setFormAberto] = useState(false);
+  const [emEdicao, setEmEdicao] = useState(null);
+  const [salvando, setSalvando] = useState(false);
+  const [confirmarId, setConfirmarId] = useState(null);
+  const [excluindoId, setExcluindoId] = useState(null);
+
+  async function carregar() {
+    try {
+      setLoading(true);
+      setError('');
+      const data = await buscarEventos();
+      setEventos(data);
+    } catch (err) {
+      console.error(err);
+      setError('Não foi possível carregar os eventos pela Azure Function.');
+    } finally {
+      setLoading(false);
+    }
+  }
 
   useEffect(() => {
-    async function load() {
-      try {
-        setLoading(true);
-        setError('');
-        const data = await buscarEventos();
-        setEventos(data);
-      } catch (err) {
-        console.error(err);
-        setError('Não foi possível carregar os eventos pela Azure Function.');
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    load();
+    carregar();
   }, []);
+
+  function notificar(texto) {
+    setAviso(texto);
+    setTimeout(() => setAviso(''), 4000);
+  }
+
+  function abrirNovo() {
+    setEmEdicao(null);
+    setFormAberto(true);
+  }
+
+  function abrirEdicao(evento) {
+    setEmEdicao(evento);
+    setFormAberto(true);
+  }
+
+  function fecharForm() {
+    setFormAberto(false);
+    setEmEdicao(null);
+  }
+
+  async function salvar(dados) {
+    try {
+      setSalvando(true);
+      setError('');
+
+      if (emEdicao) {
+        await alterarEvento(emEdicao._id, dados);
+        notificar('Evento alterado com sucesso.');
+      } else {
+        await inserirEvento(dados);
+        notificar('Evento inserido com sucesso.');
+      }
+
+      fecharForm();
+      await carregar();
+    } catch (err) {
+      console.error(err);
+      setError(`Não foi possível salvar o evento: ${err.message}`);
+    } finally {
+      setSalvando(false);
+    }
+  }
+
+  async function excluir(id) {
+    try {
+      setExcluindoId(id);
+      setError('');
+      await excluirEvento(id);
+      setConfirmarId(null);
+      notificar('Evento excluído com sucesso.');
+      await carregar();
+    } catch (err) {
+      console.error(err);
+      setError(`Não foi possível excluir o evento: ${err.message}`);
+    } finally {
+      setExcluindoId(null);
+    }
+  }
 
   const filtered = useMemo(() => {
     const statusMap = {
@@ -49,11 +121,26 @@ export default function AgendaPage() {
     <div>
       <div style={eyebrowStyle}>Agenda</div>
 
-      <h1 style={titleStyle}>Eventos do campus</h1>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          justifyContent: 'space-between',
+          gap: 20
+        }}
+      >
+        <h1 style={titleStyle}>Eventos do campus</h1>
+
+        <button onClick={abrirNovo} style={newButton}>
+          + Novo evento
+        </button>
+      </div>
 
       <p style={{ color: '#6B6880', margin: '-10px 0 22px' }}>
-        Dados carregados pelo endpoint GET da Azure Function conectado ao MongoDB Atlas.
+        CRUD completo pelas quatro Azure Functions: pesquisar, inserir, alterar e excluir.
       </p>
+
+      {aviso && <SuccessMessage message={aviso} />}
 
       <div style={{ display: 'flex', gap: 10, marginBottom: 22, flexWrap: 'wrap' }}>
         {['Todos', 'Inscrito', 'Vagas abertas', 'Lotados'].map((label) => (
@@ -95,16 +182,22 @@ export default function AgendaPage() {
       {loading && <Loading>Carregando eventos...</Loading>}
       {error && <ErrorMessage message={error} />}
 
-      {!loading && !error && (
+      {!loading && !error && filtered.length === 0 && (
+        <Loading>Nenhum evento encontrado.</Loading>
+      )}
+
+      {!loading && !error && filtered.length > 0 && (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 18 }}>
           {filtered.map((evento) => (
             <article
-              key={evento._id ?? evento.id}
+              key={evento._id}
               style={{
                 background: '#fff',
                 borderRadius: 20,
                 padding: 24,
-                boxShadow: '0 6px 20px rgba(27,26,35,.05)'
+                boxShadow: '0 6px 20px rgba(27,26,35,.05)',
+                display: 'flex',
+                flexDirection: 'column'
               }}
             >
               <div
@@ -148,9 +241,63 @@ export default function AgendaPage() {
                 <span>{evento.time}</span>
                 <span>{evento.place}</span>
               </div>
+
+              <div
+                style={{
+                  marginTop: 16,
+                  paddingTop: 14,
+                  borderTop: '1px solid #F0EEF8',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10,
+                  flexWrap: 'wrap'
+                }}
+              >
+                {confirmarId === evento._id ? (
+                  <>
+                    <span style={{ fontSize: 13, color: '#B4234B', fontWeight: 600 }}>
+                      Excluir este evento?
+                    </span>
+                    <div style={{ flex: 1 }} />
+                    <button
+                      onClick={() => excluir(evento._id)}
+                      disabled={excluindoId === evento._id}
+                      style={dangerButton}
+                    >
+                      {excluindoId === evento._id ? 'Excluindo...' : 'Confirmar'}
+                    </button>
+                    <button onClick={() => setConfirmarId(null)} style={ghostButton}>
+                      Cancelar
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <div style={{ flex: 1 }} />
+                    <button onClick={() => abrirEdicao(evento)} style={ghostButton}>
+                      Editar
+                    </button>
+                    <button
+                      onClick={() => setConfirmarId(evento._id)}
+                      style={dangerGhostButton}
+                    >
+                      Excluir
+                    </button>
+                  </>
+                )}
+              </div>
             </article>
           ))}
         </div>
+      )}
+
+      {formAberto && (
+        <EventoForm
+          evento={emEdicao}
+          salvando={salvando}
+          proximaOrdem={eventos.length + 1}
+          onSalvar={salvar}
+          onCancelar={fecharForm}
+        />
       )}
     </div>
   );
@@ -197,4 +344,49 @@ const titleStyle = {
   fontSize: 34,
   letterSpacing: '-.03em',
   margin: '0 0 22px'
+};
+
+const newButton = {
+  flex: 'none',
+  height: 42,
+  padding: '0 18px',
+  border: 'none',
+  borderRadius: 12,
+  background: '#0F8A6B',
+  color: '#fff',
+  fontWeight: 700,
+  fontSize: 14
+};
+
+const ghostButton = {
+  height: 34,
+  padding: '0 14px',
+  borderRadius: 10,
+  border: '1px solid #E2E0EE',
+  background: '#fff',
+  color: '#4A4857',
+  fontWeight: 600,
+  fontSize: 13
+};
+
+const dangerGhostButton = {
+  height: 34,
+  padding: '0 14px',
+  borderRadius: 10,
+  border: '1px solid #F3C6D2',
+  background: '#fff',
+  color: '#B4234B',
+  fontWeight: 600,
+  fontSize: 13
+};
+
+const dangerButton = {
+  height: 34,
+  padding: '0 14px',
+  borderRadius: 10,
+  border: 'none',
+  background: '#B4234B',
+  color: '#fff',
+  fontWeight: 700,
+  fontSize: 13
 };

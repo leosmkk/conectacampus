@@ -14,6 +14,24 @@ export function Loading({ children = 'Carregando...' }) {
   );
 }
 
+export function SuccessMessage({ message }) {
+  return (
+    <div
+      style={{
+        background: '#EAF7F1',
+        color: '#0F6B54',
+        borderRadius: 14,
+        padding: '14px 18px',
+        marginBottom: 18,
+        fontSize: 14,
+        fontWeight: 600
+      }}
+    >
+      {message}
+    </div>
+  );
+}
+
 export function ErrorMessage({ message }) {
   return (
     <div

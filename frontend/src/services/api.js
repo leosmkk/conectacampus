@@ -1,24 +1,56 @@
 const API_URL = import.meta.env.VITE_API_URL;
 
-async function get(path) {
+async function request(path, { method = 'GET', body } = {}) {
   if (!API_URL) {
     throw new Error('VITE_API_URL não configurada.');
   }
 
-  const response = await fetch(`${API_URL}${path}`);
+  const response = await fetch(`${API_URL}${path}`, {
+    method,
+    headers: body ? { 'Content-Type': 'application/json' } : undefined,
+    body: body ? JSON.stringify(body) : undefined
+  });
 
-  if (!response.ok) {
-    const body = await response.text();
-    throw new Error(`Erro HTTP ${response.status}: ${body}`);
+  const texto = await response.text();
+  let dados = null;
+
+  if (texto) {
+    try {
+      dados = JSON.parse(texto);
+    } catch {
+      dados = texto;
+    }
   }
 
-  return response.json();
+  if (!response.ok) {
+    const mensagem =
+      (dados && dados.message) || `Erro HTTP ${response.status}`;
+    throw new Error(mensagem);
+  }
+
+  return dados;
 }
 
+// PESQUISAR — GET /api/pesquisar
 export function buscarEventos() {
-  return get('/api/pesquisar?tipo=eventos');
+  return request('/api/pesquisar?tipo=eventos');
 }
 
 export function buscarCertificados() {
-  return get('/api/pesquisar?tipo=certificados');
+  return request('/api/pesquisar?tipo=certificados');
+}
+
+// INSERIR — POST /api/inserir
+export function inserirEvento(dados) {
+  return request('/api/inserir?tipo=eventos', { method: 'POST', body: dados });
+}
+
+// ALTERAR — PUT /api/alterar/{id}
+export function alterarEvento(id, dados) {
+  return request(`/api/alterar/${id}?tipo=eventos`, { method: 'PUT', body: dados });
+}
+
+// EXCLUIR — DELETE /api/excluir/{id}
+export function excluirEvento(id) {
+  return request(`/api/excluir/${id}?tipo=eventos`, { method: 'DELETE' });
 }
