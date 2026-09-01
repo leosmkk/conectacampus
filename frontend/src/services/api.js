@@ -16,9 +16,9 @@ async function get(path) {
 }
 
 export function buscarEventos() {
-  return get('/api/eventos');
+  return get('/api/pesquisar?tipo=eventos');
 }
 
 export function buscarCertificados() {
-  return get('/api/certificados');
+  return get('/api/pesquisar?tipo=certificados');
 }
