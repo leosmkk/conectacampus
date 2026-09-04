@@ -1,0 +1,13 @@
+{
+    "name": "conectacampus/design-patterns",
+    "description": "Exemplos de Singleton, Template Method e Strategy sobre o dominio do ConectaCampus (trabalho de reuso de software).",
+    "type": "project",
+    "require": {
+        "php": ">=7.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "ConectaCampus\\": "src/"
+        }
+    }
+}
