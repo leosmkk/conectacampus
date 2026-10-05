@@ -5,11 +5,22 @@ const { inserirEndpoint } = require('../features/inserir/inserirEndpoint');
 const { MongoRegistroUpdater } = require('../features/alterar/MongoRegistroUpdater');
 const { AlterarRegistroHandler } = require('../features/alterar/AlterarRegistroHandler');
 const { alterarEndpoint } = require('../features/alterar/alterarEndpoint');
+const { MongoRegistroFinder } = require('../features/pesquisar/MongoRegistroFinder');
+const { MongoRegistroLister } = require('../features/pesquisar/MongoRegistroLister');
+const { BuscarRegistroPorIdHandler } = require('../features/pesquisar/BuscarRegistroPorIdHandler');
+const { ListarRegistrosHandler } = require('../features/pesquisar/ListarRegistrosHandler');
+const { pesquisarEndpoint } = require('../features/pesquisar/pesquisarEndpoint');
 
 const inserirRegistroHandler = new InserirRegistroHandler(new MongoRegistroInserter());
 const alterarRegistroHandler = new AlterarRegistroHandler(new MongoRegistroUpdater());
+const buscarRegistroPorIdHandler = new BuscarRegistroPorIdHandler(new MongoRegistroFinder());
+const listarRegistrosHandler = new ListarRegistrosHandler(new MongoRegistroLister());
 
 module.exports = {
   inserirEndpoint: inserirEndpoint(inserirRegistroHandler),
-  alterarEndpoint: alterarEndpoint(alterarRegistroHandler)
+  alterarEndpoint: alterarEndpoint(alterarRegistroHandler),
+  pesquisarEndpoint: pesquisarEndpoint({
+    buscarPorIdHandler: buscarRegistroPorIdHandler,
+    listarHandler: listarRegistrosHandler
+  })
 };
