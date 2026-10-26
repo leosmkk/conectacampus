@@ -2,8 +2,7 @@
   "IsEncrypted": false,
   "Values": {
     "FUNCTIONS_WORKER_RUNTIME": "node",
-    "MONGODB_ATLAS_URI": "mongodb+srv://USUARIO:SENHA@cluster.mongodb.net/?retryWrites=true&w=majority",
-    "MONGODB_ATLAS_DATABASE": "conectacampus"
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true"
   },
   "Host": {
     "LocalHttpPort": 7071,

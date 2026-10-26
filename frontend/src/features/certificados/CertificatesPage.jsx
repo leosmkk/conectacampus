@@ -1,115 +1,76 @@
 import { useEffect, useState } from 'react';
-import { buscarCertificados } from '../../services/api.js';
-import { Loading, ErrorMessage } from '../../components/Feedback.jsx';
+import { buscarCertificados, inserirCertificado, alterarCertificado, excluirCertificado } from '../../services/api.js';
+
+const empty = { title: '', student: '', hours: 1, completedAt: '', status: 'disponivel' };
 
 export default function CertificatesPage() {
-  const [certificados, setCertificados] = useState([]);
+  const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-
-  useEffect(() => {
-    async function load() {
-      try {
-        setLoading(true);
-        setError('');
-        const data = await buscarCertificados();
-        setCertificados(data);
-      } catch (err) {
-        console.error(err);
-        setError('Não foi possível carregar os certificados pela Azure Function.');
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    load();
-  }, []);
-
-  return (
-    <div>
-      <div style={eyebrowStyle}>Certificados</div>
-
-      <h1 style={titleStyle}>Meus certificados</h1>
-
-      <p style={{ color: '#6B6880', margin: '-10px 0 22px' }}>
-        Segunda funcionalidade consumindo dados do MongoDB Atlas por Azure Functions.
-      </p>
-
-      {loading && <Loading>Carregando certificados...</Loading>}
-      {error && <ErrorMessage message={error} />}
-
-      {!loading && !error && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-          {certificados.map((certificado) => (
-            <article
-              key={certificado._id ?? certificado.id}
-              style={{
-                background: '#fff',
-                borderRadius: 20,
-                padding: '26px 28px',
-                boxShadow: '0 6px 20px rgba(27,26,35,.05)'
-              }}
-            >
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  justifyContent: 'space-between',
-                  gap: 20
-                }}
-              >
-                <div>
-                  <div
-                    style={{
-                      fontFamily: 'Manrope, sans-serif',
-                      fontWeight: 700,
-                      fontSize: 19,
-                      marginBottom: 7
-                    }}
-                  >
-                    {certificado.title}
-                  </div>
-
-                  <div style={{ fontSize: 13.5, color: '#6B6880' }}>
-                    {certificado.hours} · {certificado.completedAt}
-                  </div>
-                </div>
-
-                <button
-                  style={{
-                    height: 44,
-                    padding: '0 22px',
-                    border: 'none',
-                    borderRadius: 13,
-                    background: '#0F8A6B',
-                    color: '#fff',
-                    fontWeight: 700
-                  }}
-                >
-                  Gerar certificado
-                </button>
-              </div>
-            </article>
-          ))}
-        </div>
-      )}
-    </div>
-  );
+  const [editing, setEditing] = useState(null);
+  const [form, setForm] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const [deleting, setDeleting] = useState(null);
+  async function load() {
+    try { setItems(await buscarCertificados()); } catch (err) { setError(err.message); }
+    finally { setLoading(false); }
+  }
+  useEffect(() => { void load(); }, []);
+  function open(item) { setEditing(item?.id ?? null); setForm(item ? { ...item } : { ...empty }); setError(''); }
+  async function run(action) {
+    setBusy(true); setError('');
+    try { await action(); await load(); } catch (err) { setError(err.message); }
+    finally { setBusy(false); }
+  }
+  function save(event) {
+    event.preventDefault();
+    void run(async () => {
+      const body = { ...form, hours: Number(form.hours) };
+      if (editing) await alterarCertificado(editing, body);
+      else await inserirCertificado(body);
+      setForm(null);
+    });
+  }
+  function download(item) {
+    void run(async () => {
+      const updated = await alterarCertificado(item.id, { ...item, status: 'emitido' });
+      const text = `CERTIFICADO DE PARTICIPAÇÃO\n\n${updated.student}\n${updated.title}\nCarga horária: ${updated.hours} horas\nConclusão: ${updated.completedAt}\nIdentificador: ${updated.id}\n`;
+      const url = URL.createObjectURL(new Blob([text], { type: 'text/plain;charset=utf-8' }));
+      const link = document.createElement('a');
+      link.href = url; link.download = `certificado-${updated.id}.txt`; link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    });
+  }
+  return <section>
+    <div className="page-heading"><h1>Certificados</h1><button onClick={() => open(null)}>Novo certificado</button></div>
+    {error && <p role="alert">{error}</p>}
+    {loading && <p role="status">Carregando...</p>}
+    {!loading && !items.length && <p>Nenhum certificado encontrado.</p>}
+    <div className="certificate-list">{items.map((item) => <article className="panel" key={item.id}>
+      <h2>{item.title}</h2><p>{item.student}</p><p>{item.hours} horas, {item.completedAt}</p>
+      <p>{item.status === 'emitido' ? 'Emitido' : 'Disponível'}</p>
+      <div className="actions">
+        <button disabled={busy} onClick={() => download(item)}>Baixar certificado</button>
+        <button disabled={busy} onClick={() => open(item)}>Editar</button>
+        {deleting === item.id ? <>
+          <span>Excluir este certificado?</span>
+          <button disabled={busy} onClick={() => run(async () => { await excluirCertificado(item.id); setDeleting(null); })}>Confirmar</button>
+          <button onClick={() => setDeleting(null)}>Cancelar</button>
+        </> : <button disabled={busy} onClick={() => setDeleting(item.id)}>Excluir</button>}
+      </div>
+    </article>)}</div>
+    {form && <div className="dialog-overlay"><form role="dialog" aria-modal="true" aria-labelledby="certificate-heading" className="panel certificate-form" onSubmit={save}>
+      <h2 id="certificate-heading">{editing ? 'Editar certificado' : 'Novo certificado'}</h2>
+      {error && <p role="alert">{error}</p>}
+      {[
+        ['title', 'Evento', 'text'], ['student', 'Participante', 'text'],
+        ['hours', 'Carga horária', 'number'], ['completedAt', 'Conclusão', 'date']
+      ].map(([key, label, type]) => <label key={key}>{label}<input required maxLength={200} type={type} min={type === 'number' ? 1 : undefined} max={type === 'number' ? 1000 : undefined} value={form[key]}
+        onChange={(event) => setForm({ ...form, [key]: event.target.value })} /></label>)}
+      <label>Status<select value={form.status} onChange={(event) => setForm({ ...form, status: event.target.value })}>
+        <option value="disponivel">Disponível</option><option value="emitido">Emitido</option>
+      </select></label>
+      <div className="actions"><button disabled={busy} type="submit">{busy ? 'Salvando...' : 'Salvar'}</button><button type="button" disabled={busy} onClick={() => setForm(null)}>Cancelar</button></div>
+    </form></div>}
+  </section>;
 }
-
-const eyebrowStyle = {
-  fontWeight: 600,
-  fontSize: 12,
-  letterSpacing: '.14em',
-  textTransform: 'uppercase',
-  color: '#8B88A0',
-  marginBottom: 8
-};
-
-const titleStyle = {
-  fontFamily: 'Manrope, sans-serif',
-  fontWeight: 800,
-  fontSize: 34,
-  letterSpacing: '-.03em',
-  margin: '0 0 22px'
-};

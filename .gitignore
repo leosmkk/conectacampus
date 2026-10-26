@@ -30,3 +30,17 @@ cmake-build-*/
 
 # IntelliJ build output
 out/
+
+node_modules/
+dist/
+.env
+.env.local
+.env.*.local
+local.settings.json
+*.log
+coverage/
+test-results/
+playwright-report/
+docs/evidence/*.png
+.publish/
+.local/

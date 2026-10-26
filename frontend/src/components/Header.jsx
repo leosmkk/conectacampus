@@ -39,6 +39,7 @@ export default function Header({ screen, onNavigate }) {
 
       <nav style={{ display: 'flex', height: 72, marginLeft: 24 }}>
         {[
+          ['resumo', 'Resumo'],
           ['agenda', 'Agenda'],
           ['certificados', 'Certificados']
         ].map(([id, label]) => {
