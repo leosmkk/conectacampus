@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import Header from './components/Header.jsx';
-import AgendaPage from './features/eventos/AgendaPage.jsx';
-import CertificatesPage from './features/certificados/CertificatesPage.jsx';
+const AgendaPage = lazy(() => import('./features/eventos/AgendaPage.jsx'));
+const CertificatesPage = lazy(() => import('./features/certificados/CertificatesPage.jsx'));
+const SummaryPage = lazy(() => import('./features/resumo/SummaryPage.jsx'));
 
 export default function App() {
-  const [screen, setScreen] = useState('agenda');
+  const [screen, setScreen] = useState('resumo');
 
   return (
     <div style={{ minHeight: '100vh' }}>
@@ -17,8 +18,11 @@ export default function App() {
           padding: '34px 28px 72px'
         }}
       >
-        {screen === 'agenda' && <AgendaPage />}
-        {screen === 'certificados' && <CertificatesPage />}
+        <Suspense fallback={<p role="status">Carregando...</p>}>
+          {screen === 'resumo' && <SummaryPage />}
+          {screen === 'agenda' && <AgendaPage />}
+          {screen === 'certificados' && <CertificatesPage />}
+        </Suspense>
       </main>
     </div>
   );

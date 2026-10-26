@@ -30,7 +30,7 @@ export default function AgendaPage() {
       setEventos(data);
     } catch (err) {
       console.error(err);
-      setError('Não foi possível carregar os eventos pela Azure Function.');
+      setError('Não foi possível carregar os eventos.');
     } finally {
       setLoading(false);
     }
@@ -136,9 +136,6 @@ export default function AgendaPage() {
         </button>
       </div>
 
-      <p style={{ color: '#6B6880', margin: '-10px 0 22px' }}>
-        CRUD completo pelas quatro Azure Functions: pesquisar, inserir, alterar e excluir.
-      </p>
 
       {aviso && <SuccessMessage message={aviso} />}
 

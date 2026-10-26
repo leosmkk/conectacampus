@@ -1,0 +1,30 @@
+{
+  "updatedAt": "2026-10-26",
+  "source": "https://github.com/leosmkk/conectacampus",
+  "integrationBranch": "https://github.com/leosmkk/conectacampus/tree/feat/pjbl-distributed-architecture",
+  "repositories": {
+    "microfrontend": "https://github.com/otavioaugustosw/conectacampus-microfrontend",
+    "bff": "https://github.com/otavioaugustosw/conectacampus-bff",
+    "mongodb": "https://github.com/otavioaugustosw/conectacampus-eventos",
+    "sql": "https://github.com/otavioaugustosw/conectacampus-certificados",
+    "function": "https://github.com/otavioaugustosw/conectacampus-functions"
+  },
+  "dockerHub": null,
+  "frontend": null,
+  "gateway": null,
+  "swaggerBff": null,
+  "swaggerMongo": null,
+  "swaggerSqlAndEvents": null,
+  "youtube": null,
+  "status": {
+    "localUnitArchitectureAndHttp": "passed",
+    "componentTests": "passed",
+    "frontendBuild": "passed",
+    "browser": "passed",
+    "bicepCompile": "passed",
+    "dependencyAudit": "passed",
+    "realInfrastructureIntegration": "pending GitHub Actions",
+    "cloud": "pending accounts and resources",
+    "video": "pending group recording"
+  }
+}

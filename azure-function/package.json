@@ -1,13 +1,19 @@
 {
   "name": "conectacampus-azure-functions",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
-  "main": "src/functions/*.js",
+  "type": "module",
+  "main": "src/api/triggers.js",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
-    "start": "func start"
+    "start": "func start",
+    "dev": "node src/local.js",
+    "test": "node --test tests/*.test.js"
   },
   "dependencies": {
     "@azure/functions": "^4.5.0",
-    "mongodb": "^6.19.0"
+    "@azure/data-tables": "^13.3.0"
   }
 }
