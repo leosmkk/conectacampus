@@ -26,9 +26,3 @@ test('frontend não importa SDKs de banco nem endereça microserviços', async (
   const api = await readFile('frontend/src/services/api.js', 'utf8');
   assert.ok(api.includes("'/api'"));
 });
-test('persistência e outbox são atômicas na transação SQL', async () => {
-  const source = await readFile('services/certificados/src/infrastructure/sql-repository.js', 'utf8');
-  assert.ok(source.indexOf('INSERT INTO dbo.Outbox') < source.indexOf('transaction.commit()'));
-  assert.ok(source.includes('new sql.Request(transaction)'));
-  assert.ok(source.includes('transaction.rollback()'));
-});

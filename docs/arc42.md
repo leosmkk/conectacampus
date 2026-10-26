@@ -72,7 +72,7 @@ Manutenibilidade: domínio puro e ausência de imports entre serviços. Operabil
 
 Cloud e imagens Docker Hub dependem de contas ainda não confirmadas. Não há URL de produção validada. O vídeo exige fala real dos quatro alunos e publicação como não listado.
 
-O computador de desenvolvimento não tem Docker. A integração real é validada pelo pipeline GitHub Actions. Consulte o resultado real. Prints locais e testes com memória não substituem a evidência cloud.
+O computador de desenvolvimento não tem Docker. A integração real passou no pipeline GitHub Actions 40413543638, com CRUD, agregação, publicação e processamento de eventos. Isso comprova a execução com containers e bancos reais no runner. A demonstração cloud ainda depende da implantação pública. Prints locais e testes com memória não substituem a evidência cloud.
 
 Polling da outbox e réplicas mínimas podem consumir recursos continuamente. Listagens têm limite de 1000 registros e ledger de 100 entidades. Indicadores cobrem esse conjunto. Paginação, autenticação institucional, migrações versionadas e rastreamento distribuído são evoluções.
 

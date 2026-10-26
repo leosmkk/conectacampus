@@ -23,8 +23,10 @@
     "browser": "passed",
     "bicepCompile": "passed",
     "dependencyAudit": "passed",
-    "realInfrastructureIntegration": "pending GitHub Actions",
+    "realInfrastructureIntegration": "Aprovada no GitHub Actions: MongoDB, SQL Server, Azurite, Functions Host, outbox e ledger",
     "cloud": "pending accounts and resources",
     "video": "pending group recording"
-  }
+  },
+  "pullRequest": "https://github.com/leosmkk/conectacampus/pull/2",
+  "ciRun": "https://github.com/leosmkk/conectacampus/actions/runs/40413543638"
 }

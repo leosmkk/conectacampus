@@ -40,7 +40,7 @@ npx playwright install chromium
 npx playwright test
 ```
 
-A prévia em http://127.0.0.1:5173 usa memória e um adaptador HTTP. Não comprova bancos ou fila. O pipeline PJBL validation executa o smoke com MongoDB, SQL, Azurite e Azure Functions Host reais. Consulte seu resultado no GitHub.
+A prévia em http://127.0.0.1:5173 usa memória e um adaptador HTTP. Não comprova bancos ou fila. O pipeline PJBL validation executa o smoke com MongoDB, SQL, Azurite e Azure Functions Host reais. A integração passou no [pipeline 40413543638](https://github.com/leosmkk/conectacampus/actions/runs/40413543638). Isso não substitui a demonstração na URL cloud.
 
 ## APIs pelo gateway
 
@@ -68,7 +68,7 @@ Os componentes são publicados por git subtree split para preservar histórico. 
 
 ## Documentação e publicação
 
-[ARC42](docs/arc42.md), [C4](docs/c4.md), [Canvas](docs/canvas.md), [deploy](docs/deploy.md), [eventos AsyncAPI](docs/asyncapi.yaml), [roteiro do vídeo](docs/video.md) e [links/status](docs/links.json).
+[Entrega em PDF](docs/ConectaCampus-Entrega-3.pdf), [ARC42](docs/arc42.md), [C4](docs/c4.md), [Canvas](docs/canvas.md), [deploy](docs/deploy.md), [eventos AsyncAPI](docs/asyncapi.yaml), [roteiro do vídeo](docs/video.md) e [links/status](docs/links.json).
 
 Azure, Atlas, Docker Hub e YouTube ainda dependem de contas, recursos e gravação do grupo. A apresentação precisa usar URLs cloud. O endereço histórico https://happy-pebble-0ff30c50f.3.azurestaticapps.net/ pertence à versão original e não comprova a nova arquitetura.
 

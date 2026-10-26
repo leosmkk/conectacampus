@@ -12,4 +12,4 @@
 | Implantação | Imagens independentes, gateway público, containers internos, Function protegida por chave |
 | Riscos | Cotas de nuvem, cold start, segredos, eventual consistência e mensagens na poison queue |
 | Evidências | Testes locais, pipeline de integração e demonstração final em URLs públicas |
-| Pendências | Contas de nuvem, Docker Hub, validação de integração no pipeline e gravação do grupo |
+| Pendências | Contas de nuvem, Docker Hub, evidências públicas e gravação do grupo |
