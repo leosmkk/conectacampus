@@ -68,3 +68,14 @@ test('BFF encaminha token interno e Function key sem devolver credenciais', asyn
   });
   assert.deepEqual(await clients.enrich({}), { ok: true });
 });
+
+test('BFF com gatewaySecret so aceita chamadas vindas do API Gateway', async () => {
+  const clients = { events: async () => [], certificates: async () => [], enrich: async (body) => indicators(body) };
+  const app = bffApp(clients, { gatewaySecret: 'segredo-do-gateway' });
+  await request(app).get('/aggregated-data').expect(401);
+  await request(app).get('/api/eventos').set('x-gateway-secret', 'errado').expect(401);
+  await request(app).get('/health').expect(200);
+  await request(app).get('/api/health').expect(200);
+  await request(app).get('/aggregated-data').set('x-gateway-secret', 'segredo-do-gateway').expect(200);
+  await request(bffApp(clients)).get('/aggregated-data').expect(200);
+});

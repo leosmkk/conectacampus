@@ -15,6 +15,15 @@ param sqlUser string
 param sqlPassword string
 @secure()
 param storageConnection string
+@secure()
+param gatewaySecret string
+@description('Nome global unico do API Management (vira <nome>.azure-api.net).')
+param apimName string
+param apimPublisherName string = 'ConectaCampus'
+@description('E-mail do publicador, obrigatorio no API Management.')
+param apimPublisherEmail string
+@description('Origens do navegador autorizadas no CORS do gateway.')
+param allowedOrigins array = [ 'https://happy-pebble-0ff30c50f.3.azurestaticapps.net', 'http://localhost:5173' ]
 
 resource environment 'Microsoft.App/managedEnvironments@2024-03-01' = {
   name: 'conectacampus-env'
@@ -47,28 +56,54 @@ module bff 'container-app.bicep' = {
   name: 'bff'
   params: {
     name: 'bff', location: location, environmentId: environment.id
-    image: '${dockerHubUser}/conectacampus-bff:${tag}', port: 3000
-    secretBundle: { values: [{ name: 'service-token', value: serviceToken }, { name: 'function-key', value: functionKey }] }
+    image: '${dockerHubUser}/conectacampus-bff:${tag}', port: 3000, external: true
+    secretBundle: { values: [{ name: 'service-token', value: serviceToken }, { name: 'function-key', value: functionKey }, { name: 'gateway-secret', value: gatewaySecret }] }
     env: [
       { name: 'EVENTS_URL', value: events.outputs.url }, { name: 'CERTIFICATES_URL', value: certificates.outputs.url }
       { name: 'FUNCTION_URL', value: functionUrl }, { name: 'FUNCTION_KEY', secretRef: 'function-key' }
-      { name: 'SERVICE_TOKEN', secretRef: 'service-token' }, { name: 'PORT', value: '3000' }
+      { name: 'SERVICE_TOKEN', secretRef: 'service-token' }, { name: 'GATEWAY_SECRET', secretRef: 'gateway-secret' }, { name: 'PORT', value: '3000' }
     ]
   }
 }
-module frontend 'container-app.bicep' = {
-  name: 'frontend'
-  params: {
-    name: 'frontend', location: location, environmentId: environment.id
-    image: '${dockerHubUser}/conectacampus-frontend:${tag}', port: 8080
+// O frontend roda no Azure Static Web Apps; o gateway e o Azure API Management.
+// Obs.: o tier Consumption nao suporta rate-limit/rate-limit-by-key; a politica faz CORS e injeta o segredo.
+resource apim 'Microsoft.ApiManagement/service@2022-08-01' = {
+  name: apimName
+  location: location
+  sku: { name: 'Consumption', capacity: 0 }
+  properties: { publisherName: apimPublisherName, publisherEmail: apimPublisherEmail }
+}
+resource gatewaySecretValue 'Microsoft.ApiManagement/service/namedValues@2022-08-01' = {
+  parent: apim
+  name: 'gateway-secret'
+  properties: { displayName: 'gateway-secret', value: gatewaySecret, secret: true }
+}
+resource api 'Microsoft.ApiManagement/service/apis@2022-08-01' = {
+  parent: apim
+  name: 'conectacampus-bff'
+  properties: {
+    displayName: 'ConectaCampus BFF'
+    path: 'api'
+    protocols: [ 'https' ]
+    serviceUrl: '${bff.outputs.url}/api'
+    subscriptionRequired: false
   }
 }
-module gateway 'container-app.bicep' = {
-  name: 'gateway'
-  params: {
-    name: 'gateway', location: location, environmentId: environment.id
-    image: '${dockerHubUser}/conectacampus-gateway:${tag}', port: 8080, external: true
-    env: [{ name: 'BFF_URL', value: bff.outputs.url }, { name: 'FRONTEND_URL', value: frontend.outputs.url }]
+resource operations 'Microsoft.ApiManagement/service/apis/operations@2022-08-01' = [for method in [ 'GET', 'POST', 'PUT', 'DELETE', 'OPTIONS' ]: {
+  parent: api
+  name: toLower('any-${method}')
+  properties: { displayName: '${method} /*', method: method, urlTemplate: '/*' }
+}]
+var allowedOriginXml = join(map(allowedOrigins, origin => '<origin>${origin}</origin>'), '')
+resource apiPolicy 'Microsoft.ApiManagement/service/apis/policies@2022-08-01' = {
+  parent: api
+  name: 'policy'
+  dependsOn: [ gatewaySecretValue, operations ]
+  properties: {
+    format: 'rawxml'
+    value: '<policies><inbound><base /><cors allow-credentials="false"><allowed-origins>${allowedOriginXml}</allowed-origins><allowed-methods><method>GET</method><method>POST</method><method>PUT</method><method>DELETE</method><method>OPTIONS</method></allowed-methods><allowed-headers><header>*</header></allowed-headers></cors><set-header name="x-gateway-secret" exists-action="override"><value>{{gateway-secret}}</value></set-header></inbound><backend><base /></backend><outbound><base /></outbound><on-error><base /></on-error></policies>'
   }
 }
-output gatewayUrl string = gateway.outputs.url
+output gatewayUrl string = apim.properties.gatewayUrl
+output apiUrl string = '${apim.properties.gatewayUrl}/api'
+output bffUrl string = bff.outputs.url

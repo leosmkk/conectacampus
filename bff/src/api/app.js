@@ -1,12 +1,24 @@
 import express from 'express';
 import swagger from 'swagger-ui-express';
-import { randomUUID } from 'node:crypto';
+import { randomUUID, timingSafeEqual } from 'node:crypto';
 import { aggregate } from '../application/aggregate.js';
 import { specification } from './openapi.js';
 
-export function createApp(clients) {
+// Quando gatewaySecret existe, so o API Gateway (que injeta x-gateway-secret) alcanca o BFF.
+function gatewayGuard(secret) {
+  const expected = Buffer.from(secret);
+  return (req, res, next) => {
+    if (/^(\/api)?\/health$/.test(req.path)) return next();
+    const received = Buffer.from(String(req.get('x-gateway-secret') ?? ''));
+    if (received.length === expected.length && timingSafeEqual(received, expected)) return next();
+    res.status(401).json({ message: 'Acesso permitido somente pelo API Gateway.' });
+  };
+}
+
+export function createApp(clients, { gatewaySecret } = {}) {
   const app = express();
   app.disable('x-powered-by');
+  if (gatewaySecret) app.use(gatewayGuard(gatewaySecret));
   app.use(express.json({ limit: '32kb' }));
   app.use((req, res, next) => {
     res.set('X-Request-ID', randomUUID());
