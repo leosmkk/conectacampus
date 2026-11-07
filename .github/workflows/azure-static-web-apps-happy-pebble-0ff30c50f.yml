@@ -1,17 +1,15 @@
 name: Azure Static Web Apps CI/CD
 
-# Deploy automatico PAUSADO: o frontend novo (arquitetura PJBL) chama /api via
-# gateway e ainda nao ha gateway no Azure. Reative push/pull_request abaixo
-# quando VITE_API_URL apontar para a URL do gateway.
+# Deploy do frontend para o Static Web Apps; VITE_API_URL aponta para o API Management.
 on:
   workflow_dispatch:
-#  push:
-#    branches:
-#      - master
-#  pull_request:
-#    types: [opened, synchronize, reopened, closed]
-#    branches:
-#      - master
+  push:
+    branches:
+      - master
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    branches:
+      - master
 
 jobs:
   build_and_deploy_job:
