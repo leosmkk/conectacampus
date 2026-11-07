@@ -124,8 +124,8 @@ links = json.loads((ROOT/'docs/links.json').read_text())
 story = [Spacer(1, 48), paragraph('ConectaCampus', 'Hero'), paragraph('Arquitetura distribuída', 'Subtitle2'),
          paragraph('PJBL | Entrega 3 | 26 de outubro de 2026', 'Subtitle2'), Spacer(1, 28),
          paragraph('ARC42, C4, Architecture Canvas e evidências', 'Section'),
-         paragraph('Implementação publicada no GitHub. A conclusão da entrega depende de implantação cloud, imagens Docker Hub, evidências públicas e vídeo do grupo.'),
-         Spacer(1, 12), table([['Validação', 'Estado'], ['Testes locais e componentes', 'Aprovados'], ['Interface desktop e móvel', 'Aprovada em três testes de navegador'], ['Compilação React e Bicep', 'Aprovadas'], ['Auditoria de dependências', 'Sem alertas'], ['Integração real', links['status']['realInfrastructureIntegration']], ['Cloud, Docker Hub e vídeo', 'Pendentes']]),
+         paragraph('Implementação publicada no GitHub e implantada no Azure. A conclusão da entrega depende dos prints de nuvem e do vídeo do grupo.'),
+         Spacer(1, 12), table([['Validação', 'Estado'], ['Testes locais e componentes', 'Aprovados'], ['Interface desktop e móvel', 'Aprovada em três testes de navegador'], ['Compilação React e Bicep', 'Aprovadas'], ['Auditoria de dependências', 'Sem alertas'], ['Integração real', links['status']['realInfrastructureIntegration']], ['Cloud e Docker Hub', 'Publicados; smoke test aprovado no gateway Azure'], ['Vídeo', 'Pendente']]),
          Spacer(1, 24), paragraph('Equipe', 'Section'), paragraph((ROOT/'GRUPO.md').read_text().strip().replace('\n\n', ', ')),
          PageBreak()]
 story.extend(markdown(ROOT/'docs/arc42.md'))
@@ -136,12 +136,12 @@ diagram_page('C4: contexto', 'Nível 1. Pessoas, sistema e dependências externa
     'mongo': (.01,.12,.29,70,'<b>MongoDB Atlas</b><br/>[Sistema externo]<br/>Dados de eventos'),
     'sql': (.355,.12,.29,70,'<b>Azure SQL</b><br/>[Sistema externo]<br/>Certificados e outbox'),
     'azure': (.70,.12,.29,70,'<b>Azure Functions e Storage</b><br/>[Sistema externo]<br/>Cálculo e mensageria')
-}, [('person','system','HTTPS'),('system','mongo','Persistencia'),('system','sql','Persistencia'),('system','azure','HTTP e mensagens')], 'Escopo funcional: eventos e certificados. A infraestrutura Azure é planejada, ainda sem URL de produção validada.')
+}, [('person','system','HTTPS'),('system','mongo','Persistencia'),('system','sql','Persistencia'),('system','azure','HTTP e mensagens')], 'Escopo funcional: eventos e certificados. A infraestrutura Azure está implantada e validada por smoke test.')
 
 diagram_page('C4: containers', 'Nível 2. Chamadas síncronas e processamento assíncrono.', {
     'browser': (.0,.84,.27,48,'<b>Navegador</b><br/>[Cliente]'),
-    'gateway': (.365,.84,.27,48,'<b>API Gateway</b><br/>[Nginx]'),
-    'frontend': (.73,.84,.27,48,'<b>Microfrontend</b><br/>[React SPA]'),
+    'frontend': (.365,.84,.27,48,'<b>Microfrontend</b><br/>[React SPA]'),
+    'gateway': (.73,.84,.27,48,'<b>API Gateway</b><br/>[Azure API Management]'),
     'bff': (.365,.64,.27,52,'<b>BFF</b><br/>[Node.js / Express]'),
     'eventos': (.0,.42,.27,58,'<b>Eventos</b><br/>[Node.js]<br/>CRUD MongoDB'),
     'certs': (.365,.42,.27,58,'<b>Certificados</b><br/>[Node.js]<br/>CRUD e publicador'),
@@ -150,7 +150,7 @@ diagram_page('C4: containers', 'Nível 2. Chamadas síncronas e processamento as
     'sql': (.365,.17,.27,54,'<b>Azure SQL</b><br/>[Banco e outbox]'),
     'queue': (.73,.17,.27,54,'<b>Queue Storage</b><br/>[Fila campus-events]'),
     'table': (.73,.0,.27,44,'<b>Table Storage</b><br/>[Ledger]')
-}, [('browser','gateway','HTTPS /api'),('gateway','frontend','SPA'),('gateway','bff','Proxy /api'),('bff','eventos','HTTP + token'),('bff','certs','HTTP + token'),('bff','function','HTTP + chave'),('eventos','mongo','Driver'),('certs','sql','TDS / TLS'),('certs','queue','Publica'),('queue','function','Trigger'),('function','table','Deduplica')], 'O código React roda no navegador e chama /api no gateway. Na nuvem, somente o gateway tem ingress público entre os containers. A Function HTTP usa chave de acesso.')
+}, [('browser','frontend','HTTPS'),('frontend','gateway','HTTPS /api'),('gateway','bff','HTTPS + segredo'),('bff','eventos','HTTP + token'),('bff','certs','HTTP + token'),('bff','function','HTTP + chave'),('eventos','mongo','Driver'),('certs','sql','TDS / TLS'),('certs','queue','Publica'),('queue','function','Trigger'),('function','table','Deduplica')], 'O código React é servido pelo Static Web Apps e chama /api no API Management. O BFF só responde com o segredo que o gateway injeta. A Function HTTP usa chave de acesso.')
 
 diagram_page('C4: componentes', 'Nível 3. Interior do microserviço de certificados.', {
     'api': (.0,.81,.28,60,'<b>API Express</b><br/>[Componente]<br/>Rotas e Swagger'),
@@ -182,11 +182,11 @@ story.append(table(rows))
 story.extend([Spacer(1, 16), paragraph('Caminhos após a publicação', 'Section'), paragraph('No gateway público: /api/docs/ para BFF, /api/docs/?url=/api/specs/eventos para Mongo e /api/docs/?url=/api/specs/certificados para SQL e eventos. O contrato assíncrono está em docs/asyncapi.yaml.')])
 
 for title, filename, caption in [
-    ('Frontend em funcionamento', 'frontend-local.png', 'Prévia local em memória. Não comprova implantação cloud.'),
-    ('CRUD de certificados', 'certificados-local.png', 'Prévia local após emissão. O teste de navegador verificou criação, alteração, download e exclusão.'),
-    ('Swagger BFF', 'swagger-bff-local.png', 'Captura local da documentação de agregação e CRUD.'),
-    ('Swagger microserviço MongoDB', 'swagger-eventos-local.png', 'Captura local pelo BFF. Integração real aprovada no pipeline GitHub Actions.'),
-    ('Swagger microserviço SQL e eventos', 'swagger-certificados-local.png', 'Captura local do contrato do serviço SQL e endpoint de eventos.')
+    ('Frontend em funcionamento (nuvem)', 'frontend-cloud.jpg', 'Azure Static Web Apps (happy-pebble-0ff30c50f.3.azurestaticapps.net). O resumo vem de GET /api/aggregated-data no API Management.'),
+    ('API Gateway no Azure (API Management)', 'apim-portal-cloud.jpg', 'Portal Azure: serviço apim-campus-7e6589, tier Consumption, Brazil South, 1 API. ID da assinatura e dados da conta ocultados.'),
+    ('Swagger BFF (nuvem)', 'swagger-bff-cloud.jpg', 'https://apim-campus-7e6589.azure-api.net/api/docs/'),
+    ('Swagger microserviço MongoDB (nuvem)', 'swagger-eventos-cloud.jpg', 'https://apim-campus-7e6589.azure-api.net/api/docs/?url=/api/specs/eventos'),
+    ('Swagger microserviço SQL e eventos (nuvem)', 'swagger-certificados-cloud.jpg', 'https://apim-campus-7e6589.azure-api.net/api/docs/?url=/api/specs/certificados')
 ]:
     path = ROOT/'docs/evidence'/filename
     if not path.exists(): continue
@@ -196,7 +196,7 @@ for title, filename, caption in [
     story.extend([PageBreak(), paragraph(title, 'Section'), paragraph(caption, 'SmallText'), Spacer(1, 10), image])
 
 story.extend([PageBreak(), paragraph('Vídeo e conclusão da entrega', 'Section'), paragraph('Publicação pendente. O vídeo deve ser não listado e mostrar URLs cloud. Cada integrante precisa gravar sua fala real.'), *markdown(ROOT/'docs/video.md'),
-    paragraph('Evidências ainda necessárias', 'Section'), paragraph('Print do API Gateway no Azure, frontend cloud, Swagger cloud, imagens publicadas no Docker Hub e link YouTube. Atualize docs/links.json, substitua as capturas locais por evidências públicas e regenere o PDF após a verificação final.')])
+    paragraph('Evidências ainda necessárias', 'Section'), paragraph('Link do YouTube. Depois de gravar o vídeo, atualize docs/links.json e regenere o PDF.')])
 
 def page_decoration(canvas, doc):
     canvas.setStrokeColor(colors.HexColor('#d8e2df'))

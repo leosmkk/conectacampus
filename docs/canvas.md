@@ -9,7 +9,7 @@
 | Entradas | React pelo gateway, BFF HTTP e trigger de fila |
 | Integrações | MongoDB Atlas, Azure SQL, Functions, Queue e Table Storage |
 | Qualidade | Invariantes no domínio, dependências voltadas para dentro, transação e idempotência |
-| Implantação | Imagens independentes, gateway público, containers internos, Function protegida por chave |
+| Implantação | Imagens no Docker Hub, Azure API Management como gateway, containers no Container Apps, frontend no Static Web Apps, Function protegida por chave |
 | Riscos | Cotas de nuvem, cold start, segredos, eventual consistência e mensagens na poison queue |
 | Evidências | Testes locais, pipeline de integração e demonstração final em URLs públicas |
-| Pendências | Contas de nuvem, Docker Hub, evidências públicas e gravação do grupo |
+| Pendências | Evidências de nuvem (prints) e gravação do vídeo do grupo |

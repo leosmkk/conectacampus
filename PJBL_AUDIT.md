@@ -6,6 +6,24 @@ Audit date: 2026-11-07. Read-only. Statuses: DONE / PARTIAL / MISSING / UNVERIFI
 >
 > I exported the branch to a scratchpad folder and read it there. I did **not** run its tests locally (that needs `npm ci`). Test status comes from the GitHub Actions run below.
 
+## 0. Update 2026-11-07 (after Azure deploy)
+
+Everything runs on Azure and the cloud smoke test passed (`node scripts/smoke.mjs https://apim-campus-7e6589.azure-api.net`). Decision: one public monorepo with the five components in folders (professor's rule: publish everything in public repositories).
+
+| ID | Now | Evidence |
+|---|---|---|
+| C1-C6, C8, F1 | DONE | cloud smoke test; browser check: the SPA only calls `apim-campus-7e6589.azure-api.net` |
+| C7 | DONE | Azure API Management (Consumption): routing, CORS for the SPA, `x-gateway-secret` injection; BFF answers 401 without it. No rate limiting (not supported on Consumption) |
+| F2 | DONE | frontend `happy-pebble-0ff30c50f.3.azurestaticapps.net`, gateway `apim-campus-7e6589.azure-api.net/api` |
+| D1, D2 | DONE | 6 images public at `leosmkk/conectacampus-*:v1` (name format `user/repo:tag`; confirm with professor) |
+| G1 | DONE (monorepo) | https://github.com/leosmkk/conectacampus, public |
+| G2, P1, P2, P3, P4 | DONE | README, `docs/arc42.md`, `docs/c4.md`, `docs/canvas.md`, cloud screenshots in `docs/evidence/*-cloud.jpg`, PDF regenerated |
+| P5 | MISSING | video not recorded; script in `docs/video.md` |
+
+CI fix: `mongo:8.0` does not start on Linux kernels 6.19+ (SERVER-121912); `compose.yaml` pins `mongo:7.0`. `PJBL validation` and the Static Web Apps deploy are green.
+
+Open: video + YouTube link in `docs/links.json`; professor's answers (Canvas, Docker Hub naming, Azure SQL free offer vs "1 DTU"); rotate the Atlas password after delivery. The tables below are the earlier audit, kept for history.
+
 ## 1. Inventory
 
 Monorepo `git@github.com:leosmkk/conectacampus.git` (**public**, API reports `"visibility": "public"`).

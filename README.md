@@ -56,21 +56,21 @@ A prévia em http://127.0.0.1:5173 usa memória e um adaptador HTTP. Não compro
 
 As APIs internas exigem x-service-token. O BFF aplica a credencial no servidor. A Function exige x-functions-key na nuvem. O frontend não recebe essas chaves. A demonstração é anônima e deve usar dados fictícios.
 
-## Repositórios públicos
+## Repositório público
 
-- [Microfrontend](https://github.com/otavioaugustosw/conectacampus-microfrontend)
-- [BFF](https://github.com/otavioaugustosw/conectacampus-bff)
-- [Eventos MongoDB](https://github.com/otavioaugustosw/conectacampus-eventos)
-- [Certificados Azure SQL](https://github.com/otavioaugustosw/conectacampus-certificados)
-- [Azure Functions](https://github.com/otavioaugustosw/conectacampus-functions)
+Todo o código está neste repositório público, com cada componente em sua pasta:
 
-Os componentes são publicados por git subtree split para preservar histórico. O monorepositório é a referência de integração. Confira mudanças remotas antes de sincronizar os componentes, sem force push.
+- [Microfrontend](frontend)
+- [BFF](bff)
+- [Eventos MongoDB](services/eventos)
+- [Certificados Azure SQL](services/certificados)
+- [Azure Functions](azure-function)
 
 ## Documentação e publicação
 
 [Entrega em PDF](docs/ConectaCampus-Entrega-3.pdf), [ARC42](docs/arc42.md), [C4](docs/c4.md), [Canvas](docs/canvas.md), [deploy](docs/deploy.md), [eventos AsyncAPI](docs/asyncapi.yaml), [roteiro do vídeo](docs/video.md) e [links/status](docs/links.json).
 
-Azure, Atlas, Docker Hub e YouTube ainda dependem de contas, recursos e gravação do grupo. A apresentação precisa usar URLs cloud. O endereço histórico https://happy-pebble-0ff30c50f.3.azurestaticapps.net/ pertence à versão original e não comprova a nova arquitetura.
+Implantação no Azure: frontend em https://happy-pebble-0ff30c50f.3.azurestaticapps.net/ e API Gateway (Azure API Management) em https://apim-campus-7e6589.azure-api.net/api. As imagens estão no Docker Hub em leosmkk/conectacampus-*:v1. Falta publicar o vídeo no YouTube.
 
 As versões transitivas Azure Identity 4.13.0 e UUID 11 estão fixadas para corrigir os alertas encontrados. UUID 11 mantém a interface CommonJS utilizada. Reavalie esses pins ao atualizar mssql/tedious.
 

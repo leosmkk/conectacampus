@@ -1,20 +1,20 @@
 {
-  "updatedAt": "2026-10-26",
+  "updatedAt": "2026-11-07",
   "source": "https://github.com/leosmkk/conectacampus",
-  "integrationBranch": "https://github.com/leosmkk/conectacampus/tree/feat/pjbl-distributed-architecture",
+  "integrationBranch": "https://github.com/leosmkk/conectacampus",
   "repositories": {
-    "microfrontend": "https://github.com/otavioaugustosw/conectacampus-microfrontend",
-    "bff": "https://github.com/otavioaugustosw/conectacampus-bff",
-    "mongodb": "https://github.com/otavioaugustosw/conectacampus-eventos",
-    "sql": "https://github.com/otavioaugustosw/conectacampus-certificados",
-    "function": "https://github.com/otavioaugustosw/conectacampus-functions"
+    "microfrontend": "https://github.com/leosmkk/conectacampus/tree/master/frontend",
+    "bff": "https://github.com/leosmkk/conectacampus/tree/master/bff",
+    "mongodb": "https://github.com/leosmkk/conectacampus/tree/master/services/eventos",
+    "sql": "https://github.com/leosmkk/conectacampus/tree/master/services/certificados",
+    "function": "https://github.com/leosmkk/conectacampus/tree/master/azure-function"
   },
-  "dockerHub": null,
-  "frontend": null,
-  "gateway": null,
-  "swaggerBff": null,
-  "swaggerMongo": null,
-  "swaggerSqlAndEvents": null,
+  "dockerHub": "https://hub.docker.com/u/leosmkk (leosmkk/conectacampus-bff, -eventos, -certificados, -frontend, -function, -gateway : v1)",
+  "frontend": "https://happy-pebble-0ff30c50f.3.azurestaticapps.net",
+  "gateway": "https://apim-campus-7e6589.azure-api.net/api",
+  "swaggerBff": "https://apim-campus-7e6589.azure-api.net/api/docs/",
+  "swaggerMongo": "https://apim-campus-7e6589.azure-api.net/api/docs/?url=/api/specs/eventos",
+  "swaggerSqlAndEvents": "https://apim-campus-7e6589.azure-api.net/api/docs/?url=/api/specs/certificados",
   "youtube": null,
   "status": {
     "localUnitArchitectureAndHttp": "passed",
@@ -24,9 +24,8 @@
     "bicepCompile": "passed",
     "dependencyAudit": "passed",
     "realInfrastructureIntegration": "Aprovada no GitHub Actions: MongoDB, SQL Server, Azurite, Functions Host, outbox e ledger",
-    "cloud": "pending accounts and resources",
+    "cloud": "Implantado no Azure (API Management, Container Apps, Function, SQL); smoke test aprovado no gateway",
     "video": "pending group recording"
   },
-  "pullRequest": "https://github.com/leosmkk/conectacampus/pull/2",
-  "ciRun": "https://github.com/leosmkk/conectacampus/actions/runs/40413543638"
+  "ciRun": "https://github.com/leosmkk/conectacampus/actions/runs/42405126580"
 }

@@ -12,7 +12,7 @@ Alunos: Anna Quezia Dos Santos, Laura Rodrigues de Souza de Camargo, Leonardo Sm
 
 O frontend consome somente o BFF pelo gateway. Eventos pertencem ao MongoDB e certificados ao Azure SQL. Nenhum serviço acessa o banco do outro. Código público, READMEs, Swagger, Docker e testes são obrigatórios. A apresentação local não substitui a demonstração cloud.
 
-A referência “Free 1 DTU” do enunciado difere da oferta gratuita atual do Azure SQL, baseada em cotas serverless. Confira a elegibilidade da assinatura. Não foram criados recursos cloud nem assumidos custos nesta etapa.
+A referência “Free 1 DTU” do enunciado difere da oferta gratuita atual do Azure SQL, baseada em cotas serverless. Confira a elegibilidade da assinatura. A implantação usa a oferta gratuita serverless, de um banco por assinatura, que pausa por inatividade e pode atrasar a primeira consulta.
 
 ## 3. Contexto e escopo
 
@@ -22,7 +22,7 @@ Os modelos C4 de contexto, containers e componentes estão em docs/c4.md e nas p
 
 ## 4. Estratégia da solução
 
-A SPA possui módulos de Resumo, Agenda e Certificados, carregados separadamente. Nginx centraliza a entrada. O BFF faz proxy dos CRUDs e agrega dados em GET /aggregated-data. Foram preservados os domínios do projeto original.
+A SPA possui módulos de Resumo, Agenda e Certificados, carregados separadamente. O Azure API Management centraliza a entrada na nuvem, e o Nginx cumpre esse papel apenas no Compose local. O BFF faz proxy dos CRUDs e agrega dados em GET /aggregated-data. Foram preservados os domínios do projeto original.
 
 Clean Architecture direciona as dependências ao domínio. Na Application dos microserviços, cada operação CRUD tem seu slice. Infrastructure implementa repositórios, enquanto API expõe HTTP e Swagger.
 
@@ -46,11 +46,11 @@ Consumo: o Queue Trigger valida o contrato e cria a entidade no ledger. Chave ex
 
 Compose contém gateway, frontend, BFF, serviços, MongoDB, SQL Server, Azurite e Azure Functions Host. Apenas a porta 8080 é publicada. O banco local e o schema SQL são inicializados. Credenciais ficam fora do Git.
 
-Bicep define Container Apps com gateway público e demais apps internos. Atlas, Azure SQL, Storage e Function App são pré-requisitos descritos no guia de deploy. O ingress Azure termina TLS. Os cinco componentes têm Dockerfiles e repositórios independentes. Gateway e infraestrutura ficam no repositório de integração.
+Na nuvem (Azure, região Brazil South) o frontend roda no Azure Static Web Apps (https://happy-pebble-0ff30c50f.3.azurestaticapps.net). O Azure API Management, no tier Consumption, é o gateway público (https://apim-campus-7e6589.azure-api.net/api): roteia para o BFF, aplica CORS restrito ao site e injeta o segredo x-gateway-secret. BFF, Eventos e Certificados rodam em Container Apps, e o BFF só responde quando recebe o segredo. Azure SQL, Storage, Function App e MongoDB Atlas completam o ambiente. O Bicep em infra/ implanta os Container Apps e o API Management, e as imagens estão no Docker Hub (leosmkk/conectacampus-*:v1). Os cinco componentes ficam em pastas do repositório público único, cada um com Dockerfile próprio.
 
 ## 8. Conceitos transversais
 
-Segurança: token interno, Function key no servidor, limites de requisições, payload e métodos, bancos sem portas publicadas. Não há login de usuário final. A demonstração deve conter somente dados de teste.
+Segurança: token interno entre serviços, Function key no servidor, segredo do gateway exigido pelo BFF, CORS restrito ao site, limites de payload e métodos no Nginx local e bancos sem portas publicadas no Compose. O API Management Consumption não oferece limite de requisições, o que é uma limitação conhecida. Não há login de usuário final. A demonstração deve conter somente dados de teste.
 
 Observabilidade: X-Request-ID no BFF, logs de falha da outbox e id do evento processado. /events permite comparar publicação e ledger. Health informa processo ativo. Smoke verifica dependências e dados.
 
@@ -60,7 +60,7 @@ Testes: regras puras, CRUD HTTP, fronteiras de imports, interface em navegador e
 
 ADR 01: preservar eventos, certificados e a interface do ConectaCampus. ADR 02: manter bancos isolados por domínio. ADR 03: usar outbox para persistência atômica e consumidor idempotente para reentrega.
 
-ADR 04: usar Azure Queue e Table Storage para mensageria e evidência de processamento. ADR 05: usar Nginx como gateway e TLS do Container Apps. AWS Gateway era uma opção tecnológica do enunciado.
+ADR 04: usar Azure Queue e Table Storage para mensageria e evidência de processamento. ADR 05: usar o Azure API Management (Consumption) como API Gateway na nuvem, mantendo tudo no Azure, e o Nginx apenas no Compose local. AWS API Gateway era a opção citada no enunciado. ADR 06: fixar mongo:7.0 no Compose, porque o mongo:8.0 não inicia em kernels Linux 6.19 ou mais novos (SERVER-121912).
 
 ## 10. Requisitos de qualidade
 
@@ -70,16 +70,16 @@ Manutenibilidade: domínio puro e ausência de imports entre serviços. Operabil
 
 ## 11. Riscos e pendências
 
-Cloud e imagens Docker Hub dependem de contas ainda não confirmadas. Não há URL de produção validada. O vídeo exige fala real dos quatro alunos e publicação como não listado.
+A implantação cloud e as imagens do Docker Hub estão publicadas, e o smoke test passou contra a URL do API Management. Pendentes: prints de nuvem e o vídeo, que exige fala real dos quatro alunos e publicação como não listado.
 
-O computador de desenvolvimento não tem Docker. A integração real passou no pipeline GitHub Actions 40413543638, com CRUD, agregação, publicação e processamento de eventos. Isso comprova a execução com containers e bancos reais no runner. A demonstração cloud ainda depende da implantação pública. Prints locais e testes com memória não substituem a evidência cloud.
+A integração real roda no pipeline GitHub Actions (42405126580) com containers e bancos reais, e o mesmo smoke test passou contra o gateway Azure, cobrindo CRUD no MongoDB e no SQL, agregação, Function e mensageria. Prints locais e testes com memória não substituem a evidência cloud.
 
-Polling da outbox e réplicas mínimas podem consumir recursos continuamente. Listagens têm limite de 1000 registros e ledger de 100 entidades. Indicadores cobrem esse conjunto. Paginação, autenticação institucional, migrações versionadas e rastreamento distribuído são evoluções.
+Polling da outbox e réplicas mínimas podem consumir recursos continuamente. O Azure SQL gratuito pausa por inatividade, o que atrasa a primeira consulta, e os Container Apps mantêm uma réplica ativa. Listagens têm limite de 1000 registros e ledger de 100 entidades. Indicadores cobrem esse conjunto. Paginação, autenticação institucional, migrações versionadas e rastreamento distribuído são evoluções.
 
 ## 12. Glossário e referências
 
 BFF: backend específico da interface. Slice: caso de uso por operação. Outbox: eventos na transação do dado de negócio. Ledger: registro idempotente. Gateway: entrada central com encaminhamento e controles.
 
-Links verificados e pendências ficam em docs/links.json e na tabela do PDF. Cloud, Docker Hub e YouTube ficam pendentes até existirem evidências reais. O roteiro do vídeo e o guia de publicação acompanham o projeto.
+Links verificados e pendências ficam em docs/links.json e na tabela do PDF. O link do YouTube fica pendente até a gravação do vídeo. O roteiro do vídeo e o guia de publicação acompanham o projeto.
 
 Referências oficiais: https://learn.microsoft.com/azure/azure-functions/functions-reference-node e https://learn.microsoft.com/azure/azure-functions/functions-bindings-storage-queue-trigger. Oferta SQL: https://learn.microsoft.com/azure/azure-sql/database/free-offer. Ingress: https://learn.microsoft.com/azure/container-apps/ingress.
