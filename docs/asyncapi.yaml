@@ -1,0 +1,38 @@
+asyncapi: 3.0.0
+info:
+  title: ConectaCampus eventos de certificados
+  version: 1.0.0
+  description: Outbox SQL com entrega pelo menos uma vez e consumidor idempotente.
+channels:
+  campusEvents:
+    address: campus-events
+    messages:
+      certificateChanged:
+        $ref: '#/components/messages/CertificateChanged'
+operations:
+  publishCertificateEvent:
+    action: send
+    channel: { $ref: '#/channels/campusEvents' }
+  processCertificateEvent:
+    action: receive
+    channel: { $ref: '#/channels/campusEvents' }
+components:
+  messages:
+    CertificateChanged:
+      contentType: application/json
+      payload:
+        type: object
+        required: [id, type, version, source, subject, occurredAt, data]
+        properties:
+          id: { type: string, format: uuid }
+          type: { type: string, enum: [certificate.created, certificate.updated, certificate.deleted] }
+          version: { type: integer, const: 1 }
+          source: { type: string, const: certificados }
+          subject: { type: string, format: uuid }
+          occurredAt: { type: string, format: date-time }
+          data:
+            type: object
+            required: [certificateId, hours]
+            properties:
+              certificateId: { type: string, format: uuid }
+              hours: { type: integer, minimum: 0 }

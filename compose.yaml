@@ -1,0 +1,94 @@
+services:
+  mongodb:
+    image: mongo:8.0
+    volumes: [mongo-data:/data/db]
+    healthcheck:
+      test: [CMD, mongosh, --quiet, --eval, "db.adminCommand('ping').ok"]
+      interval: 10s
+      retries: 12
+  sql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    platform: linux/amd64
+    environment:
+      ACCEPT_EULA: 'Y'
+      MSSQL_PID: Developer
+      MSSQL_SA_PASSWORD: ${SQL_PASSWORD:?Execute node scripts/init-local.mjs}
+    volumes: [sql-data:/var/opt/mssql]
+    healthcheck:
+      test: [CMD-SHELL, '/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P "$$MSSQL_SA_PASSWORD" -Q "SELECT 1" -b']
+      interval: 10s
+      start_period: 30s
+      retries: 20
+  sql-init:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    platform: linux/amd64
+    depends_on:
+      sql: { condition: service_healthy }
+    environment:
+      SQLCMDPASSWORD: ${SQL_PASSWORD:?}
+    entrypoint: [/opt/mssql-tools18/bin/sqlcmd, -C, -S, sql, -U, sa, -b, -Q, "IF DB_ID('conectacampus') IS NULL CREATE DATABASE conectacampus"]
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite:3.35.0
+    command: azurite --blobHost 0.0.0.0 --queueHost 0.0.0.0 --tableHost 0.0.0.0 --skipApiVersionCheck
+    environment:
+      AZURITE_ACCOUNTS: campus:${STORAGE_KEY:?}
+    volumes: [storage-data:/data]
+  eventos:
+    build: ./services/eventos
+    restart: on-failure
+    depends_on:
+      mongodb: { condition: service_healthy }
+    environment:
+      MONGODB_URI: mongodb://mongodb:27017
+      MONGODB_DATABASE: conectacampus
+      SERVICE_TOKEN: ${SERVICE_TOKEN:?}
+      PORT: 3001
+  certificados:
+    build: ./services/certificados
+    restart: on-failure
+    depends_on:
+      sql-init: { condition: service_completed_successfully }
+      azurite: { condition: service_started }
+    environment:
+      PORT: 3002
+      SQL_SERVER: sql
+      SQL_DATABASE: conectacampus
+      SQL_USER: sa
+      SQL_PASSWORD: ${SQL_PASSWORD:?}
+      SQL_ENCRYPT: 'false'
+      SQL_TRUST_CERTIFICATE: 'true'
+      SERVICE_TOKEN: ${SERVICE_TOKEN:?}
+      STORAGE_CONNECTION_STRING: DefaultEndpointsProtocol=http;AccountName=campus;AccountKey=${STORAGE_KEY:?};QueueEndpoint=http://azurite:10001/campus;BlobEndpoint=http://azurite:10000/campus;TableEndpoint=http://azurite:10002/campus
+  function:
+    build: ./azure-function
+    restart: on-failure
+    depends_on: [azurite]
+    volumes: ['./.local/function-secrets:/azure-functions-host/Secrets']
+    environment:
+      AzureWebJobsSecretStorageType: files
+      AzureWebJobsStorage: DefaultEndpointsProtocol=http;AccountName=campus;AccountKey=${STORAGE_KEY:?};QueueEndpoint=http://azurite:10001/campus;BlobEndpoint=http://azurite:10000/campus;TableEndpoint=http://azurite:10002/campus
+      FUNCTIONS_WORKER_RUNTIME: node
+  bff:
+    build: ./bff
+    restart: on-failure
+    depends_on: [eventos, certificados, function]
+    environment:
+      PORT: 3000
+      EVENTS_URL: http://eventos:3001
+      CERTIFICATES_URL: http://certificados:3002
+      FUNCTION_URL: http://function
+      FUNCTION_KEY: ${FUNCTION_KEY:?}
+      SERVICE_TOKEN: ${SERVICE_TOKEN:?}
+  frontend:
+    build: ./frontend
+  gateway:
+    build: ./gateway
+    depends_on: [frontend, bff]
+    ports: ['8080:8080']
+    environment:
+      BFF_URL: http://bff:3000
+      FRONTEND_URL: http://frontend:8080
+volumes:
+  mongo-data:
+  sql-data:
+  storage-data:

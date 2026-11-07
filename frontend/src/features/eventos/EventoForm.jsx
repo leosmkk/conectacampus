@@ -14,7 +14,7 @@ export default function EventoForm({ evento, salvando, proximaOrdem, onSalvar, o
     status: evento?.status ?? 'vagas',
     order: evento?.order ?? proximaOrdem,
     seatsUsed: evento?.seatsUsed ?? 0,
-    seatsTotal: evento?.seatsTotal ?? 0
+    seatsTotal: evento?.seatsTotal ?? 1
   }));
 
   function set(campo, valor) {
@@ -36,17 +36,15 @@ export default function EventoForm({ evento, salvando, proximaOrdem, onSalvar, o
     <div style={overlay} onClick={onCancelar}>
       <form
         style={modal}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Evento"
         onClick={(e) => e.stopPropagation()}
         onSubmit={submeter}
       >
         <h2 style={modalTitle}>
           {editando ? 'Editar evento' : 'Cadastrar evento'}
         </h2>
-        <p style={modalHint}>
-          {editando
-            ? 'As alterações são enviadas para a Function alterar (PUT /api/alterar/{id}).'
-            : 'Os dados são enviados para a Function inserir (POST /api/inserir).'}
-        </p>
 
         <div style={grid}>
           <Campo full label="Título do evento">
@@ -154,8 +152,7 @@ export default function EventoForm({ evento, salvando, proximaOrdem, onSalvar, o
 function Campo({ label, full, children }) {
   return (
     <div style={{ gridColumn: full ? '1 / -1' : 'auto' }}>
-      <label style={labelStyle}>{label}</label>
-      {children}
+      <label style={labelStyle}>{label}{children}</label>
     </div>
   );
 }

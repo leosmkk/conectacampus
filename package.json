@@ -1,0 +1,30 @@
+{
+  "name": "conectacampus-pjbl",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "frontend",
+    "bff",
+    "services/eventos",
+    "services/certificados",
+    "azure-function"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "build": "npm run build --workspace frontend",
+    "check": "npm test && npm run build",
+    "smoke": "node scripts/smoke.mjs",
+    "dev": "node scripts/dev.mjs"
+  },
+  "devDependencies": {
+    "supertest": "^7.1.4",
+    "@playwright/test": "^1.56.0"
+  },
+  "overrides": {
+    "@azure/identity": "4.13.0",
+    "uuid": "^11.1.1"
+  }
+}

@@ -26,3 +26,28 @@ select option {
   color: #1B1A23;
   background: #fff;
 }
+
+button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid #5250bf; outline-offset: 3px; }
+.page-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
+.page-heading h1 { margin: 0; font-size: 32px; }
+.summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 18px; }
+.panel { background: #fff; padding: 24px; border-radius: 18px; box-shadow: 0 6px 20px #1b1a230d; }
+.panel h2, .panel h3 { margin-top: 0; }
+.metric { display: block; font-size: 34px; margin-top: 12px; color: #0f8a6b; }
+.page-heading button, .actions button { background: #0f8a6b; color: #fff; border: 0; border-radius: 10px; padding: 12px 16px; font-weight: 600; }
+.actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.certificate-list { display: grid; gap: 18px; }
+.dialog-overlay { position: fixed; inset: 0; background: #1b1a2370; z-index: 50; display: grid; place-items: start center; padding: 40px 20px; overflow: auto; }
+.certificate-form { width: min(100%, 580px); }
+.certificate-form label { display: block; margin: 16px 0; font-weight: 600; }
+.certificate-form input, .certificate-form select { display: block; margin-top: 8px; width: 100%; padding: 12px; border: 1px solid #d3d0e0; border-radius: 10px; }
+button:disabled { opacity: .55; cursor: wait; }
+@media (max-width: 650px) {
+  header { gap: 10px !important; padding: 0 12px !important; }
+  header nav { margin-left: 0 !important; }
+  header nav button { padding: 0 9px !important; }
+  header > div:first-child { display: none !important; }
+  main { padding: 24px 16px !important; }
+  .page-heading h1 { font-size: 26px; }
+  main > div > div[style*="grid"] { grid-template-columns: 1fr !important; }
+}

@@ -1,0 +1,27 @@
+limit_req_zone $binary_remote_addr zone=campus:10m rate=10r/s;
+server {
+  listen 8080;
+  server_tokens off;
+  client_max_body_size 32k;
+  add_header X-Content-Type-Options nosniff always;
+  add_header Referrer-Policy strict-origin-when-cross-origin always;
+  add_header X-Frame-Options DENY always;
+  location = /health { access_log off; return 200 'ok'; }
+  location /api/ {
+    limit_req zone=campus burst=40 nodelay;
+    limit_req_status 429;
+    limit_except GET POST PUT DELETE { deny all; }
+    proxy_pass ${BFF_URL};
+    proxy_ssl_server_name on;
+    proxy_set_header Host $proxy_host;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_read_timeout 30s;
+    proxy_connect_timeout 5s;
+  }
+  location / {
+    limit_except GET { deny all; }
+    proxy_pass ${FRONTEND_URL};
+    proxy_ssl_server_name on;
+    proxy_set_header Host $proxy_host;
+  }
+}

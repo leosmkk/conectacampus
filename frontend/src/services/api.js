@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_API_URL || '/api';
 
 async function request(path, { method = 'GET', body } = {}) {
   if (!API_URL) {
@@ -31,26 +31,27 @@ async function request(path, { method = 'GET', body } = {}) {
   return dados;
 }
 
-// PESQUISAR — GET /api/pesquisar
 export function buscarEventos() {
-  return request('/api/pesquisar?tipo=eventos');
+  return request('/eventos');
 }
 
 export function buscarCertificados() {
-  return request('/api/pesquisar?tipo=certificados');
+  return request('/certificados');
 }
 
-// INSERIR — POST /api/inserir
 export function inserirEvento(dados) {
-  return request('/api/inserir?tipo=eventos', { method: 'POST', body: dados });
+  return request('/eventos', { method: 'POST', body: dados });
 }
 
-// ALTERAR — PUT /api/alterar/{id}
 export function alterarEvento(id, dados) {
-  return request(`/api/alterar/${id}?tipo=eventos`, { method: 'PUT', body: dados });
+  return request(`/eventos/${encodeURIComponent(id)}`, { method: 'PUT', body: dados });
 }
 
-// EXCLUIR — DELETE /api/excluir/{id}
 export function excluirEvento(id) {
-  return request(`/api/excluir/${id}?tipo=eventos`, { method: 'DELETE' });
+  return request(`/eventos/${encodeURIComponent(id)}`, { method: 'DELETE' });
 }
+
+export const buscarResumo = () => request('/aggregated-data');
+export const inserirCertificado = (body) => request('/certificados', { method: 'POST', body });
+export const alterarCertificado = (id, body) => request(`/certificados/${encodeURIComponent(id)}`, { method: 'PUT', body });
+export const excluirCertificado = (id) => request(`/certificados/${encodeURIComponent(id)}`, { method: 'DELETE' });
