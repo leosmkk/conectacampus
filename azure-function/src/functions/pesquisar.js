@@ -1,13 +1,18 @@
+// registra funções HTTP na Azure Functions
 const { app } = require('@azure/functions');
 const { ObjectId } = require('mongodb');
 const { getDatabase } = require('../db');
 const { getTipo } = require('../collection');
 
+// app.http: registra uma função que poderá ser executada quando uma requisição HTTP chegar
 app.http('pesquisar', {
   methods: ['GET'],
   authLevel: 'anonymous',
   route: 'pesquisar',
 
+  // handler: é a função executada quando uma requisição chega
+  // request: representa a requisição HTTP, assim conseguimos acessar os parâmetros enviados pelo frontend
+  // context: contém informações sobre a execução da Azure e disponibiliza recursos como registro de erro
   handler: async (request, context) => {
     try {
       const tipo = getTipo(request);

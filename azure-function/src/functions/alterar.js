@@ -1,8 +1,10 @@
+// registra funções HTTP na Azure Functions
 const { app } = require('@azure/functions');
 const { ObjectId } = require('mongodb');
 const { getDatabase } = require('../db');
 const { getTipo } = require('../collection');
 
+// PUT é usado para atualizar um recurso existente
 app.http('alterar', {
   methods: ['PUT'],
   authLevel: 'anonymous',
@@ -52,6 +54,7 @@ app.http('alterar', {
         };
       }
 
+      // recupera o registro após a alteração
       const registro = await collection.findOne({ _id: new ObjectId(id) });
 
       return {

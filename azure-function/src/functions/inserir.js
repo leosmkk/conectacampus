@@ -1,3 +1,4 @@
+// registra funções HTTP na Azure Functions
 const { app } = require('@azure/functions');
 const { getDatabase } = require('../db');
 const { getTipo } = require('../collection');
