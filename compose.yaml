@@ -58,6 +58,7 @@ services:
       SQL_ENCRYPT: 'false'
       SQL_TRUST_CERTIFICATE: 'true'
       SERVICE_TOKEN: ${SERVICE_TOKEN:?}
+      OUTBOX_POLL_MS: 3000
       STORAGE_CONNECTION_STRING: DefaultEndpointsProtocol=http;AccountName=campus;AccountKey=${STORAGE_KEY:?};QueueEndpoint=http://azurite:10001/campus;BlobEndpoint=http://azurite:10000/campus;TableEndpoint=http://azurite:10002/campus
   function:
     build: ./azure-function

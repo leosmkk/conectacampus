@@ -12,7 +12,7 @@ Alunos: Anna Quezia Dos Santos, Laura Rodrigues de Souza de Camargo, Leonardo Sm
 
 O frontend consome somente o BFF pelo gateway. Eventos pertencem ao MongoDB e certificados ao Azure SQL. Nenhum serviço acessa o banco do outro. Código público, READMEs, Swagger, Docker e testes são obrigatórios. A apresentação local não substitui a demonstração cloud.
 
-A referência “Free 1 DTU” do enunciado difere da oferta gratuita atual do Azure SQL, baseada em cotas serverless. Confira a elegibilidade da assinatura. A implantação usa a oferta gratuita serverless, de um banco por assinatura, que pausa por inatividade e pode atrasar a primeira consulta.
+A referência “Free 1 DTU” do enunciado difere da oferta gratuita atual do Azure SQL, baseada em cotas serverless. Confira a elegibilidade da assinatura. A implantação usa o tier Basic de 5 DTU, a opção mais próxima do "1 DTU" do enunciado: a oferta gratuita serverless teve a cota mensal esgotada em cerca de dois dias pela varredura constante da outbox. O custo é de poucos centavos por dia do crédito de estudante.
 
 ## 3. Contexto e escopo
 
@@ -60,7 +60,7 @@ Testes: regras puras, CRUD HTTP, fronteiras de imports, interface em navegador e
 
 ADR 01: preservar eventos, certificados e a interface do ConectaCampus. ADR 02: manter bancos isolados por domínio. ADR 03: usar outbox para persistência atômica e consumidor idempotente para reentrega.
 
-ADR 04: usar Azure Queue e Table Storage para mensageria e evidência de processamento. ADR 05: usar o Azure API Management (Consumption) como API Gateway na nuvem, mantendo tudo no Azure, e o Nginx apenas no Compose local. AWS API Gateway era a opção citada no enunciado. ADR 06: fixar mongo:7.0 no Compose, porque o mongo:8.0 não inicia em kernels Linux 6.19 ou mais novos (SERVER-121912).
+ADR 04: usar Azure Queue e Table Storage para mensageria e evidência de processamento. ADR 05: usar o Azure API Management (Consumption) como API Gateway na nuvem, mantendo tudo no Azure, e o Nginx apenas no Compose local. AWS API Gateway era a opção citada no enunciado. ADR 06: fixar mongo:7.0 no Compose, porque o mongo:8.0 não inicia em kernels Linux 6.19 ou mais novos (SERVER-121912). ADR 07: migrar o SQL do tier gratuito para o Basic e ampliar a varredura da outbox de 3 s para 30 s, porque a varredura curta mantinha o serverless ativo e consumiu os 100 mil vCore-segundos mensais.
 
 ## 10. Requisitos de qualidade
 
@@ -74,7 +74,7 @@ A implantação cloud e as imagens do Docker Hub estão publicadas, e o smoke te
 
 A integração real roda no pipeline GitHub Actions (42405126580) com containers e bancos reais, e o mesmo smoke test passou contra o gateway Azure, cobrindo CRUD no MongoDB e no SQL, agregação, Function e mensageria. Prints locais e testes com memória não substituem a evidência cloud.
 
-Polling da outbox e réplicas mínimas podem consumir recursos continuamente. O Azure SQL gratuito pausa por inatividade, o que atrasa a primeira consulta, e os Container Apps mantêm uma réplica ativa. Listagens têm limite de 1000 registros e ledger de 100 entidades. Indicadores cobrem esse conjunto. Paginação, autenticação institucional, migrações versionadas e rastreamento distribuído são evoluções.
+Polling da outbox e réplicas mínimas podem consumir recursos continuamente. O Azure SQL Basic fica sempre ligado e consome crédito de forma contínua (cerca de US$5 por mês), e os Container Apps mantêm uma réplica ativa. A outbox é varrida a cada 30 s (OUTBOX_POLL_MS), então um evento pode levar até 30 s para chegar à Function. Listagens têm limite de 1000 registros e ledger de 100 entidades. Indicadores cobrem esse conjunto. Paginação, autenticação institucional, migrações versionadas e rastreamento distribuído são evoluções.
 
 ## 12. Glossário e referências
 

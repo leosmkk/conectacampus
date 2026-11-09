@@ -1,6 +1,8 @@
 param location string = resourceGroup().location
 param dockerHubUser string
 param tag string = 'v1'
+@description('Tag da imagem do servico de certificados (pode diferir das demais).')
+param certificadosTag string = tag
 param functionUrl string
 @secure()
 param functionKey string
@@ -43,12 +45,12 @@ module certificates 'container-app.bicep' = {
   name: 'certificates'
   params: {
     name: 'certificados', location: location, environmentId: environment.id
-    image: '${dockerHubUser}/conectacampus-certificados:${tag}', port: 3002
+    image: '${dockerHubUser}/conectacampus-certificados:${certificadosTag}', port: 3002
     secretBundle: { values: [{ name: 'sql-password', value: sqlPassword }, { name: 'storage', value: storageConnection }, { name: 'service-token', value: serviceToken }] }
     env: [
       { name: 'SQL_SERVER', value: sqlServer }, { name: 'SQL_DATABASE', value: sqlDatabase }, { name: 'SQL_USER', value: sqlUser }
       { name: 'SQL_PASSWORD', secretRef: 'sql-password' }, { name: 'STORAGE_CONNECTION_STRING', secretRef: 'storage' }
-      { name: 'SERVICE_TOKEN', secretRef: 'service-token' }, { name: 'PORT', value: '3002' }
+      { name: 'SERVICE_TOKEN', secretRef: 'service-token' }, { name: 'OUTBOX_POLL_MS', value: '30000' }, { name: 'PORT', value: '3002' }
     ]
   }
 }

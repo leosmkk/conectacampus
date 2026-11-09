@@ -19,10 +19,12 @@ const repository = sqlRepository(pool);
 const queue = new QueueClient(process.env.STORAGE_CONNECTION_STRING, 'campus-events');
 await queue.createIfNotExists();
 let stopped = false;
+// Intervalo de varredura da outbox (ms). Padrao 30 s; minimo 1 s.
+const pollMs = Math.max(1000, Number(process.env.OUTBOX_POLL_MS) || 30000);
 let timer;
 async function dispatch() {
   try { await publishEvents(repository, queue); } catch (error) { console.error('outbox.retry_pending', error.name); }
-  if (!stopped) timer = setTimeout(dispatch, 3000);
+  if (!stopped) timer = setTimeout(dispatch, pollMs);
 }
 void dispatch();
 const server = createApp(repository, process.env.SERVICE_TOKEN).listen(process.env.PORT ?? 3002, '0.0.0.0');

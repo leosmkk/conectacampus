@@ -21,7 +21,8 @@ try {
   assert.ok(data.certificados.some((item) => item.id === certificate.id));
   assert.ok(data.indicadores.totalHours >= 4);
   let processed = false;
-  for (let attempt = 0; attempt < 30; attempt++) {
+  // A outbox e varrida a cada OUTBOX_POLL_MS (30 s na nuvem), entao espere ate 2 min.
+  for (let attempt = 0; attempt < 120; attempt++) {
     const events = await call('/events');
     if (events.outbox.some((item) => item.event.subject === certificate.id && item.publishedAt) && events.processed.some((item) => item.subject === certificate.id)) { processed = true; break; }
     await new Promise((resolve) => setTimeout(resolve, 1000));

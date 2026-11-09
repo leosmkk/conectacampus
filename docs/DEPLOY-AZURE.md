@@ -66,12 +66,13 @@ The queue `campus-events` is created by the certificados service and the ledger 
 
 ```bash
 az sql server create -g $RG -n $SQLSRV -l $LOC -u $SQLUSER -p "$SQLPASS"
-az sql db create -g $RG -s $SQLSRV -n conectacampus --use-free-limit --free-limit-exhaustion-behavior AutoPause
+az sql db create -g $RG -s $SQLSRV -n conectacampus --edition Basic --service-objective Basic --max-size 2GB
 az sql server firewall-rule create -g $RG -s $SQLSRV -n AllowAzureServices --start-ip-address 0.0.0.0 --end-ip-address 0.0.0.0
 ```
 
-- "Free 1 DTU" does not exist; this is the current free serverless offer (auto-pauses, first query can take 30-60 s).
-- If the free offer is rejected for your subscription, create a paid Basic database instead: `az sql db create -g $RG -s $SQLSRV -n conectacampus --edition Basic` (about US$5/month).
+- Use **Basic (5 DTU, about US$5/month, billed hourly)**. We first tried the free serverless offer, but the outbox poller keeps a serverless database awake, and the monthly free quota (100,000 vCore-seconds) ran out in about two days, leaving the database paused until the next month.
+- To convert an existing free database in place and keep its data: `az sql db update -g $RG -s $SQLSRV -n conectacampus --edition Basic --service-objective Basic --max-size 2GB --use-free-limit false`.
+- The certificados service polls the outbox every `OUTBOX_POLL_MS` ms (30000 in the cloud, 3000 in Compose).
 - The certificados service creates its tables on first start (see `docs/deploy.md`).
 
 ## 4. MongoDB Atlas (web console) [YOU]

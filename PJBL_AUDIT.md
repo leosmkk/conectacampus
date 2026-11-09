@@ -20,6 +20,8 @@ Everything runs on Azure and the cloud smoke test passed (`node scripts/smoke.mj
 | G2, P1, P2, P3, P4 | DONE | README, `docs/arc42.md`, `docs/c4.md`, `docs/canvas.md`, cloud screenshots in `docs/evidence/*-cloud.jpg`, PDF regenerated |
 | P5 | MISSING | video not recorded; script in `docs/video.md` |
 
+SQL: the free serverless database ran out of its monthly quota (poller every 3 s kept it awake); converted in place to **Basic 5 DTU** (about US$5/month of student credit) and the outbox poll is now 30 s (`OUTBOX_POLL_MS`, image `leosmkk/conectacampus-certificados:v2`). APIM CORS now also allows the gateway's own origin (Swagger UI POST fix, Laura's commit c3bbd9e).
+
 CI fix: `mongo:8.0` does not start on Linux kernels 6.19+ (SERVER-121912); `compose.yaml` pins `mongo:7.0`. `PJBL validation` and the Static Web Apps deploy are green.
 
 Open: video + YouTube link in `docs/links.json`; professor's answers (Canvas, Docker Hub naming, Azure SQL free offer vs "1 DTU"); rotate the Atlas password after delivery. The tables below are the earlier audit, kept for history.
