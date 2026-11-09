@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "ConectaCampus: painel de chamadas (gravação manual)",
+  "version": "1.0.0",
+  "description": "Mostra o painel \"Chamadas de rede (API Gateway)\" sobre o site e a Swagger. Alt+H esconde/mostra, Alt+C limpa.",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://happy-pebble-0ff30c50f.3.azurestaticapps.net/*",
+        "https://apim-campus-7e6589.azure-api.net/*"
+      ],
+      "js": ["hud.js"],
+      "run_at": "document_start",
+      "world": "MAIN"
+    }
+  ]
+}
