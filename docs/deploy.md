@@ -15,6 +15,8 @@ A oferta gratuita atual do Azure SQL usa limites de computação serverless e ar
 5. Publique o conteúdo de azure-function com Azure Functions Core Tools. Execute npm ci no componente e func azure functionapp publish NOME_DA_FUNCTION. Confira no portal os triggers enrich, events e campusEvents.
 6. Obtenha uma Function key de escopo de aplicação. Guarde em configuração segura e passe somente para o BFF. Não coloque a chave no frontend.
 
+O Bicep autoriza automaticamente também `https://<apimName>.azure-api.net` no CORS do APIM: é a origem da Swagger UI hospedada pelo próprio gateway. Mantenha `allowedOrigins` somente para origens adicionais, como o frontend e o ambiente local.
+
 ## Docker Hub
 
 Docker Hub aceita usuário/repositório:tag. O formato com dois níveis de repositório mostrado no enunciado não se aplica ao Docker Hub.

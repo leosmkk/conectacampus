@@ -22,7 +22,7 @@ param apimName string
 param apimPublisherName string = 'ConectaCampus'
 @description('E-mail do publicador, obrigatorio no API Management.')
 param apimPublisherEmail string
-@description('Origens do navegador autorizadas no CORS do gateway.')
+@description('Origens adicionais do navegador autorizadas no CORS do gateway.')
 param allowedOrigins array = [ 'https://happy-pebble-0ff30c50f.3.azurestaticapps.net', 'http://localhost:5173' ]
 
 resource environment 'Microsoft.App/managedEnvironments@2024-03-01' = {
@@ -94,7 +94,12 @@ resource operations 'Microsoft.ApiManagement/service/apis/operations@2022-08-01'
   name: toLower('any-${method}')
   properties: { displayName: '${method} /*', method: method, urlTemplate: '/*' }
 }]
-var allowedOriginXml = join(map(allowedOrigins, origin => '<origin>${origin}</origin>'), '')
+// O Swagger UI e servido pelo proprio gateway. Sem esta origem, o APIM encerra
+// requisicoes com Origin do Swagger em 200 vazio antes de encaminha-las ao BFF.
+// union tambem evita uma entrada duplicada se a origem for passada como parametro.
+var swaggerOrigin = 'https://${apimName}.azure-api.net'
+var corsOrigins = union(allowedOrigins, [ swaggerOrigin ])
+var allowedOriginXml = join(map(corsOrigins, origin => '<origin>${origin}</origin>'), '')
 resource apiPolicy 'Microsoft.ApiManagement/service/apis/policies@2022-08-01' = {
   parent: api
   name: 'policy'
