@@ -1,6 +1,6 @@
 # Roteiro do vídeo
 
-Publicação pendente. Cada integrante precisa gravar sua própria fala. Enviar ao YouTube como não listado e registrar o link em docs/links.json. Mostrar URLs públicas durante toda a demonstração.
+Vídeo publicado no YouTube como não listado: https://youtu.be/0Q4IWo1clfI. Cada integrante gravou a própria fala, e o vídeo mostra URLs públicas durante toda a demonstração.
 
 1. Anna Quezia Dos Santos: apresentar o objetivo, abrir o frontend na URL cloud e mostrar Resumo e Agenda.
 2. Laura Rodrigues de Souza de Camargo: criar, consultar, editar e excluir um evento. Mostrar validação de vagas e Swagger do microserviço Mongo pelo gateway.

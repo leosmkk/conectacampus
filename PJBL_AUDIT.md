@@ -18,7 +18,7 @@ Everything runs on Azure and the cloud smoke test passed (`node scripts/smoke.mj
 | D1, D2 | DONE | 6 images public at `leosmkk/conectacampus-*:v1` (name format `user/repo:tag`; confirm with professor) |
 | G1 | DONE (monorepo) | https://github.com/leosmkk/conectacampus, public |
 | G2, P1, P2, P3, P4 | DONE | README, `docs/arc42.md`, `docs/c4.md`, `docs/canvas.md`, cloud screenshots in `docs/evidence/*-cloud.jpg`, PDF regenerated |
-| P5 | MISSING | video not recorded; script in `docs/video.md` |
+| P5 | DONE | video published on YouTube (unlisted): https://youtu.be/0Q4IWo1clfI |
 
 SQL: the free serverless database ran out of its monthly quota (poller every 3 s kept it awake); converted in place to **Basic 5 DTU** (about US$5/month of student credit) and the outbox poll is now 30 s (`OUTBOX_POLL_MS`, image `leosmkk/conectacampus-certificados:v2`). APIM CORS now also allows the gateway's own origin (Swagger UI POST fix, Laura's commit c3bbd9e).
 

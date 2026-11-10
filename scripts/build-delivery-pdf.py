@@ -124,8 +124,8 @@ links = json.loads((ROOT/'docs/links.json').read_text())
 story = [Spacer(1, 48), paragraph('ConectaCampus', 'Hero'), paragraph('Arquitetura distribuída', 'Subtitle2'),
          paragraph('PJBL | Entrega 3 | 26 de outubro de 2026', 'Subtitle2'), Spacer(1, 28),
          paragraph('ARC42, C4, Architecture Canvas e evidências', 'Section'),
-         paragraph('Implementação publicada no GitHub e implantada no Azure. A conclusão da entrega depende dos prints de nuvem e do vídeo do grupo.'),
-         Spacer(1, 12), table([['Validação', 'Estado'], ['Testes locais e componentes', 'Aprovados'], ['Interface desktop e móvel', 'Aprovada em três testes de navegador'], ['Compilação React e Bicep', 'Aprovadas'], ['Auditoria de dependências', 'Sem alertas'], ['Integração real', links['status']['realInfrastructureIntegration']], ['Cloud e Docker Hub', 'Publicados; smoke test aprovado no gateway Azure'], ['Vídeo', 'Pendente']]),
+         paragraph('Implementação publicada no GitHub e implantada no Azure. Demonstrada em vídeo no YouTube, com a fala de todos os integrantes.'),
+         Spacer(1, 12), table([['Validação', 'Estado'], ['Testes locais e componentes', 'Aprovados'], ['Interface desktop e móvel', 'Aprovada em três testes de navegador'], ['Compilação React e Bicep', 'Aprovadas'], ['Auditoria de dependências', 'Sem alertas'], ['Integração real', links['status']['realInfrastructureIntegration']], ['Cloud e Docker Hub', 'Publicados; smoke test aprovado no gateway Azure'], ['Vídeo', 'Publicado no YouTube (não listado)']]),
          Spacer(1, 24), paragraph('Equipe', 'Section'), paragraph((ROOT/'GRUPO.md').read_text().strip().replace('\n\n', ', ')),
          PageBreak()]
 story.extend(markdown(ROOT/'docs/arc42.md'))
@@ -195,8 +195,8 @@ for title, filename, caption in [
     image.drawWidth, image.drawHeight = image.imageWidth*ratio, image.imageHeight*ratio
     story.extend([PageBreak(), paragraph(title, 'Section'), paragraph(caption, 'SmallText'), Spacer(1, 10), image])
 
-story.extend([PageBreak(), paragraph('Vídeo e conclusão da entrega', 'Section'), paragraph('Publicação pendente. O vídeo deve ser não listado e mostrar URLs cloud. Cada integrante precisa gravar sua fala real.'), *markdown(ROOT/'docs/video.md'),
-    paragraph('Evidências ainda necessárias', 'Section'), paragraph('Link do YouTube. Depois de gravar o vídeo, atualize docs/links.json e regenere o PDF.')])
+story.extend([PageBreak(), paragraph('Vídeo e conclusão da entrega', 'Section'), paragraph('Vídeo publicado no YouTube (não listado): https://youtu.be/0Q4IWo1clfI. Mostra URLs de nuvem e a fala dos integrantes.'), *markdown(ROOT/'docs/video.md'),
+    paragraph('Evidência do vídeo', 'Section'), paragraph('Link do vídeo: https://youtu.be/0Q4IWo1clfI')])
 
 def page_decoration(canvas, doc):
     canvas.setStrokeColor(colors.HexColor('#d8e2df'))

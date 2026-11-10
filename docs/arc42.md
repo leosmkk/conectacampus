@@ -70,7 +70,7 @@ Manutenibilidade: domínio puro e ausência de imports entre serviços. Operabil
 
 ## 11. Riscos e pendências
 
-A implantação cloud e as imagens do Docker Hub estão publicadas, e o smoke test passou contra a URL do API Management. Pendentes: prints de nuvem e o vídeo, que exige fala real dos quatro alunos e publicação como não listado.
+A implantação cloud e as imagens do Docker Hub estão publicadas, e o smoke test passou contra a URL do API Management. O vídeo da demonstração, com a fala dos quatro alunos, está publicado no YouTube como não listado: https://youtu.be/0Q4IWo1clfI.
 
 A integração real roda no pipeline GitHub Actions (42405126580) com containers e bancos reais, e o mesmo smoke test passou contra o gateway Azure, cobrindo CRUD no MongoDB e no SQL, agregação, Function e mensageria. Prints locais e testes com memória não substituem a evidência cloud.
 
@@ -80,6 +80,6 @@ Polling da outbox e réplicas mínimas podem consumir recursos continuamente. O 
 
 BFF: backend específico da interface. Slice: caso de uso por operação. Outbox: eventos na transação do dado de negócio. Ledger: registro idempotente. Gateway: entrada central com encaminhamento e controles.
 
-Links verificados e pendências ficam em docs/links.json e na tabela do PDF. O link do YouTube fica pendente até a gravação do vídeo. O roteiro do vídeo e o guia de publicação acompanham o projeto.
+Links verificados e pendências ficam em docs/links.json e na tabela do PDF. O vídeo da demonstração está em https://youtu.be/0Q4IWo1clfI (não listado). O roteiro do vídeo e o guia de publicação acompanham o projeto.
 
 Referências oficiais: https://learn.microsoft.com/azure/azure-functions/functions-reference-node e https://learn.microsoft.com/azure/azure-functions/functions-bindings-storage-queue-trigger. Oferta SQL: https://learn.microsoft.com/azure/azure-sql/database/free-offer. Ingress: https://learn.microsoft.com/azure/container-apps/ingress.

@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-07",
+  "updatedAt": "2026-11-10",
   "source": "https://github.com/leosmkk/conectacampus",
   "integrationBranch": "https://github.com/leosmkk/conectacampus",
   "repositories": {
@@ -15,7 +15,7 @@
   "swaggerBff": "https://apim-campus-7e6589.azure-api.net/api/docs/",
   "swaggerMongo": "https://apim-campus-7e6589.azure-api.net/api/docs/?url=/api/specs/eventos",
   "swaggerSqlAndEvents": "https://apim-campus-7e6589.azure-api.net/api/docs/?url=/api/specs/certificados",
-  "youtube": null,
+  "youtube": "https://youtu.be/0Q4IWo1clfI",
   "status": {
     "localUnitArchitectureAndHttp": "passed",
     "componentTests": "passed",
@@ -25,7 +25,7 @@
     "dependencyAudit": "passed",
     "realInfrastructureIntegration": "Aprovada no GitHub Actions: MongoDB, SQL Server, Azurite, Functions Host, outbox e ledger",
     "cloud": "Implantado no Azure (API Management, Container Apps, Function, SQL); smoke test aprovado no gateway",
-    "video": "pending group recording"
+    "video": "Publicado no YouTube (não listado)"
   },
   "ciRun": "https://github.com/leosmkk/conectacampus/actions/runs/42405126580"
 }

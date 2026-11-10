@@ -70,7 +70,7 @@ Todo o código está neste repositório público, com cada componente em sua pas
 
 [Entrega em PDF](docs/ConectaCampus-Entrega-3.pdf), [ARC42](docs/arc42.md), [C4](docs/c4.md), [Canvas](docs/canvas.md), [deploy](docs/deploy.md), [eventos AsyncAPI](docs/asyncapi.yaml), [roteiro do vídeo](docs/video.md) e [links/status](docs/links.json).
 
-Implantação no Azure: frontend em https://happy-pebble-0ff30c50f.3.azurestaticapps.net/ e API Gateway (Azure API Management) em https://apim-campus-7e6589.azure-api.net/api. As imagens estão no Docker Hub em leosmkk/conectacampus-*:v1. Falta publicar o vídeo no YouTube.
+Implantação no Azure: frontend em https://happy-pebble-0ff30c50f.3.azurestaticapps.net/ e API Gateway (Azure API Management) em https://apim-campus-7e6589.azure-api.net/api. As imagens estão no Docker Hub em leosmkk/conectacampus-*:v1. Vídeo da demonstração (YouTube, não listado): https://youtu.be/0Q4IWo1clfI
 
 As versões transitivas Azure Identity 4.13.0 e UUID 11 estão fixadas para corrigir os alertas encontrados. UUID 11 mantém a interface CommonJS utilizada. Reavalie esses pins ao atualizar mssql/tedious.
 

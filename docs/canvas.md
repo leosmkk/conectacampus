@@ -12,4 +12,4 @@
 | Implantação | Imagens no Docker Hub, Azure API Management como gateway, containers no Container Apps, frontend no Static Web Apps, Function protegida por chave |
 | Riscos | Cotas de nuvem, cold start, segredos, eventual consistência e mensagens na poison queue |
 | Evidências | Testes locais, pipeline de integração e demonstração final em URLs públicas |
-| Pendências | Evidências de nuvem (prints) e gravação do vídeo do grupo |
+| Pendências | Nenhuma para a entrega: vídeo publicado no YouTube (não listado) |
